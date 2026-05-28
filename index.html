@@ -429,8 +429,7 @@ header p {
 }
 
 /* hot tile pulse */
-.tile { transform-box: fill-box; transform-origin: center; transition: transform .32s cubic-bezier(.4,0,.2,1); }
-.tile.flip-down { transform: scaleY(0); }
+.tile.tweening { transition: opacity .55s cubic-bezier(.25,.1,.25,1); }
 .tile.in-logo { animation: none !important; }
 .tile.hot {
   animation: hotPulse var(--dur, 2.6s) ease-in-out infinite;
@@ -888,34 +887,14 @@ async function playLogoFlip() {
   const imgW = (clusterCols - innerPad * 2) * STEP;
   const imgH = (clusterRows - innerPad * 2) * STEP;
 
-  const DOWN = 300, UP = 300, HOLD = 1700, STAGGER = 12, FADE = 350;
-  const maxDelay = (clusterCols - 1) * STAGGER;
-
-  flat.forEach(t => t.classList.add('in-logo'));
-
-  const setDelays = forward => {
-    for (let c = 0; c < clusterCols; c++) {
-      const d = (forward ? c : (clusterCols - 1 - c)) * STAGGER;
-      for (let r = 0; r < clusterRows; r++) {
-        const t = tilesGrid[r][c];
-        if (t) t.style.transitionDelay = d + 'ms';
-      }
-    }
-  };
-
-  setDelays(true);
-  flat.forEach(t => t.classList.add('flip-down'));
-  await wait(DOWN + maxDelay);
+  const FADE = 550, HOLD = 1700;
 
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const dimOpacity = isDark ? 0.12 : 0.20;
 
-  const snap = flat.map(t => ({ el: t, fill: t.getAttribute('fill'), op: t.getAttribute('opacity') }));
-  flat.forEach(t => t.setAttribute('opacity', String(dimOpacity)));
-
-  setDelays(false);
-  flat.forEach(t => t.classList.remove('flip-down'));
-  await wait(UP + maxDelay);
+  flat.forEach(t => { t.classList.add('in-logo'); t.classList.add('tweening'); });
+  await new Promise(r => requestAnimationFrame(r));
+  flat.forEach(t => { t.style.opacity = String(dimOpacity); });
 
   const svgMarkup = logo.svg.replace(/__FG__/g, themeFG());
   const img = document.createElementNS(SVG_NS, 'image');
@@ -926,7 +905,7 @@ async function playLogoFlip() {
   img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
   img.setAttribute('href', 'data:image/svg+xml;utf8,' + encodeURIComponent(svgMarkup));
   img.style.opacity = '0';
-  img.style.transition = `opacity ${FADE}ms ease`;
+  img.style.transition = `opacity ${FADE}ms cubic-bezier(.25,.1,.25,1)`;
   mosaic.appendChild(img);
   await new Promise(r => requestAnimationFrame(r));
   img.style.opacity = '1';
@@ -934,26 +913,13 @@ async function playLogoFlip() {
   await wait(FADE + HOLD);
 
   img.style.opacity = '0';
-  await wait(FADE + 20);
+  flat.forEach(t => { t.style.opacity = ''; });
+  await wait(FADE + 40);
+
   img.remove();
-
-  setDelays(true);
-  flat.forEach(t => t.classList.add('flip-down'));
-  await wait(DOWN + maxDelay);
-
-  snap.forEach(s => {
-    if (!s.el.isConnected) return;
-    s.el.setAttribute('fill', s.fill);
-    s.el.setAttribute('opacity', s.op);
-  });
-
-  setDelays(false);
-  flat.forEach(t => t.classList.remove('flip-down'));
-  await wait(UP + maxDelay + 60);
-
   flat.forEach(t => {
     t.classList.remove('in-logo');
-    t.style.transitionDelay = '';
+    t.classList.remove('tweening');
   });
   logoBusy = false;
   scheduleNextLogo();
