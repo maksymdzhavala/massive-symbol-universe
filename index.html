@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One API. Every symbol. — Massive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@400..700&family=Roboto:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:           #fff;
+  --surface:      #fafafa;
+  --surface-2:    #f5f5f5;
+
+  --border:       rgba(0,0,0,0.08);
+  --border-2:     rgba(0,0,0,0.14);
+  --border-3:     rgba(0,0,0,0.22);
+
+  --fg-50:        #0a0a0a;
+  --fg-100:       #171717;
+  --fg-300:       #525252;
+  --fg-500:       #737373;
+  --fg-700:       #a3a3a3;
+  --fg-900:       #d4d4d4;
+
+  --sans:         'Geist', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  --mono:         'Geist Mono', ui-monospace, SFMono-Regular, 'JetBrains Mono', monospace;
+
+  --btn-primary-bg:    var(--fg-50);
+  --btn-primary-fg:    #fff;
+  --btn-primary-hover: #262626;
+  --kbd-bg:            rgba(0,0,0,0.02);
+  --hover-tint:        rgba(0,0,0,0.035);
+  --hover-tint-soft:   rgba(0,0,0,0.015);
+  --tab-bg:            rgba(255,255,255,0.45);
+  --tab-active-bg:     rgba(255,255,255,0.85);
+  --glass:             rgba(255,255,255,0.55);
+  --glass-2:           rgba(255,255,255,0.4);
+  --glass-3:           rgba(255,255,255,0.3);
+  --dot-color:         rgba(0,0,0,0.07);
+
+  --glass-blur:        blur(28px) saturate(150%);
+  --ticker-blur:       blur(24px) saturate(150%);
+
+  --image-blend:       multiply;
+  --image-invert:      0;
+  --media-w:           75vw;
+  --media-w-max:       1400px;
+  --media-h:           1600px;
+  --media-opacity:     0.85;
+  --media-mask-l:      65%;
+  --media-mask-b:      70%;
+  --media-z:           0;
+
+  --c-stocks:   #2563eb;
+  --c-options:  #a855f7;
+  --c-indices:  #10b981;
+  --c-futures:  #eab308;
+  --c-currencies: #14b8a6;
+
+  --stage-bg-1: rgba(255,255,255,0.7);
+  --stage-bg-2: rgba(255,255,255,0.45);
+  --stage-aura: rgba(37,99,235,0.06);
+}
+
+[data-theme="dark"] {
+  --bg:           #0a0a0a;
+  --surface:      #171717;
+  --surface-2:    #262626;
+
+  --border:       rgba(255,255,255,0.07);
+  --border-2:     rgba(255,255,255,0.12);
+  --border-3:     rgba(255,255,255,0.20);
+
+  --fg-50:        #fafafa;
+  --fg-100:       #e5e5e5;
+  --fg-300:       #a3a3a3;
+  --fg-500:       #737373;
+  --fg-700:       #525252;
+  --fg-900:       #262626;
+
+  --btn-primary-bg:    #fafafa;
+  --btn-primary-fg:    #0a0a0a;
+  --btn-primary-hover: #e5e5e5;
+  --kbd-bg:            rgba(255,255,255,0.04);
+  --hover-tint:        rgba(255,255,255,0.05);
+  --hover-tint-soft:   rgba(255,255,255,0.025);
+  --tab-bg:            rgba(30,30,30,0.5);
+  --tab-active-bg:     rgba(40,40,40,0.85);
+  --glass:             rgba(20,20,20,0.5);
+  --glass-2:           rgba(20,20,20,0.38);
+  --glass-3:           rgba(15,15,15,0.4);
+  --dot-color:         rgba(255,255,255,0.07);
+
+  --image-blend:  screen;
+  --image-invert: 1;
+
+  --c-stocks:   #60a5fa;
+  --c-options:  #c084fc;
+  --c-indices:  #34d399;
+  --c-futures:  #fbbf24;
+  --c-currencies: #2dd4bf;
+
+  --stage-bg-1: rgba(20,20,20,0.55);
+  --stage-bg-2: rgba(15,15,15,0.4);
+  --stage-aura: rgba(96,165,250,0.10);
+}
+
+[data-style="solid"] {
+  --glass:         var(--surface);
+  --glass-2:       var(--bg);
+  --glass-3:       var(--surface);
+  --glass-blur:    none;
+  --ticker-blur:   none;
+  --media-w:       70vw;
+  --media-w-max:   1200px;
+  --media-h:       820px;
+  --media-opacity: 0.78;
+  --media-mask-l:  60%;
+  --media-mask-b:  55%;
+  --media-z:       1;
+}
+[data-theme="dark"][data-style="solid"] {
+  --glass:   var(--surface);
+  --glass-2: var(--bg);
+  --glass-3: var(--surface);
+}
+
+html { transition: background-color .4s ease; }
+body, .stage, .legend, .legend > div, .region-label, .scale-chip, .foot {
+  transition: background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg-100);
+  font: 400 16px/1.5 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  padding: 96px 180px 120px;
+  position: relative;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 1px 1px, var(--dot-color) 1px, transparent 0);
+  background-size: 22px 22px;
+  pointer-events: none;
+  z-index: 0;
+  -webkit-mask-image: radial-gradient(ellipse 65% 70% at 50% 0%, #000 25%, transparent 75%);
+          mask-image: radial-gradient(ellipse 65% 70% at 50% 0%, #000 25%, transparent 75%);
+}
+.wrap { max-width: none; margin: 0; position: relative; z-index: 1; }
+
+/* controls */
+.controls {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.theme-toggle, .style-toggle, .legend-toggle {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid var(--border-2);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--ticker-blur);
+          backdrop-filter: var(--ticker-blur);
+  color: var(--fg-100);
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 10px 30px -20px rgba(0,0,0,0.25);
+  transition: background .2s ease, border-color .2s ease, transform .2s ease, color .2s ease;
+}
+.theme-toggle:hover, .style-toggle:hover, .legend-toggle:hover { background: var(--tab-active-bg); border-color: var(--border-3); transform: translateY(-1px); }
+.theme-toggle svg, .style-toggle svg, .legend-toggle svg { width: 18px; height: 18px; transition: opacity .25s ease, transform .35s ease; position: absolute; }
+
+.theme-toggle .icon-sun  { opacity: 0; transform: rotate(-90deg) scale(.7); }
+.theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+[data-theme="dark"] .theme-toggle .icon-sun  { opacity: 1; transform: rotate(0) scale(1); }
+[data-theme="dark"] .theme-toggle .icon-moon { opacity: 0; transform: rotate(90deg) scale(.7); }
+.style-toggle .icon-solid { opacity: 0; transform: scale(.7); }
+.style-toggle .icon-glass { opacity: 1; transform: scale(1); }
+[data-style="solid"] .style-toggle .icon-solid { opacity: 1; transform: scale(1); }
+[data-style="solid"] .style-toggle .icon-glass { opacity: 0; transform: scale(.7); }
+.legend-toggle .icon-off { opacity: 0; transform: scale(.7); }
+.legend-toggle .icon-on  { opacity: 1; transform: scale(1); }
+[data-legend="off"] .legend-toggle .icon-off { opacity: 1; transform: scale(1); }
+[data-legend="off"] .legend-toggle .icon-on  { opacity: 0; transform: scale(.7); }
+[data-legend="off"] .legend { display: none; }
+
+.hero {
+  position: relative;
+  margin-bottom: 116px;
+}
+.hero-text {
+  position: relative;
+  z-index: 2;
+  max-width: 760px;
+}
+.hero-media {
+  position: absolute;
+  top: -96px;
+  right: -180px;
+  width: var(--media-w);
+  max-width: var(--media-w-max);
+  height: var(--media-h);
+  pointer-events: none;
+  z-index: var(--media-z);
+  transition: width .4s ease, height .4s ease;
+}
+.hero-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top right;
+  display: block;
+  mix-blend-mode: var(--image-blend);
+  filter: invert(var(--image-invert));
+  opacity: var(--media-opacity);
+  -webkit-mask-image:
+    linear-gradient(to left,   #000 var(--media-mask-l), transparent 100%),
+    linear-gradient(to bottom, #000 var(--media-mask-b), transparent 100%);
+  -webkit-mask-composite: source-in;
+          mask-image:
+    linear-gradient(to left,   #000 var(--media-mask-l), transparent 100%),
+    linear-gradient(to bottom, #000 var(--media-mask-b), transparent 100%);
+          mask-composite: intersect;
+  transition: opacity .4s ease;
+}
+header { margin-bottom: 28px; }
+.cta-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font: 500 14px/1 var(--sans);
+  letter-spacing: -.01em;
+  transition: background .18s ease, border-color .18s ease, color .18s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+}
+.btn.primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+  border-color: var(--btn-primary-bg);
+}
+.btn.primary:hover { background: var(--btn-primary-hover); border-color: var(--btn-primary-hover); }
+.btn.secondary {
+  background: transparent;
+  color: var(--fg-50);
+  border-color: var(--border-2);
+}
+.btn.secondary:hover { background: var(--hover-tint); border-color: var(--border-3); }
+.btn .arrow { display: inline-block; transition: transform .18s ease; }
+.btn:hover .arrow { transform: translateX(2px); }
+.btn.secondary .kbd {
+  font: 500 11px/1 var(--mono);
+  color: var(--fg-500);
+  border: 1px solid var(--border-2);
+  background: var(--kbd-bg);
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+}
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12px/1 var(--mono);
+  letter-spacing: -.01em;
+  color: var(--fg-300);
+  background: transparent;
+  border: 1px solid var(--border-2);
+  padding: 7px 12px;
+  border-radius: 999px;
+  margin-bottom: 28px;
+}
+.eyebrow::before {
+  content: "";
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--fg-100);
+  box-shadow: 0 0 0 3px var(--hover-tint);
+}
+h1 {
+  font: 600 64px/1.02 var(--sans);
+  letter-spacing: -.045em;
+  margin: 0 0 20px;
+  color: var(--fg-50);
+}
+h1 .accent {
+  background: linear-gradient(to right, var(--fg-50) 20%, var(--fg-500) 90%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+header p {
+  font-size: 18px; line-height: 1.55;
+  color: var(--fg-300);
+  margin: 0; max-width: 620px;
+  letter-spacing: -.01em;
+}
+
+/* stage */
+.stage {
+  position: relative;
+  z-index: 2;
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  background:
+    radial-gradient(1200px 600px at 50% 50%, var(--stage-aura), transparent 70%),
+    linear-gradient(180deg, var(--stage-bg-1) 0%, var(--stage-bg-2) 100%);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  box-shadow: none;
+  aspect-ratio: 1200 / 520;
+}
+[data-theme="dark"] .stage {
+  box-shadow: none;
+}
+
+.stage svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* region overlay labels */
+.region-label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  pointer-events: none;
+  z-index: 2;
+  isolation: isolate;
+  padding: 16px 18px 16px 20px;
+  width: max-content;
+  min-width: 220px;
+  max-width: 300px;
+  border-radius: 0;
+  background: rgba(255,255,255,0.78);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 1px 2px rgba(0,0,0,0.04),
+    0 14px 36px -16px rgba(0,0,0,0.22);
+}
+[data-theme="dark"] .region-label {
+  background: rgba(15,15,15,0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 14px 36px -16px rgba(0,0,0,0.7);
+}
+.region-label .head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.region-label .head-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 18px;
+  font: 600 10px/1 var(--mono);
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--fg-100);
+}
+.region-label .ico-row {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  display: flex;
+  align-items: center;
+  color: var(--c);
+}
+.region-label .ico-row svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.region-label .count {
+  font: 600 30px/1 var(--mono);
+  letter-spacing: -.035em;
+  color: var(--fg-50);
+  font-variant-numeric: tabular-nums;
+}
+.region-label .sub {
+  font: 500 9px/1.3 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-300);
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: .35; }
+}
+
+/* hot tile pulse */
+.tile.hot {
+  animation: hotPulse var(--dur, 2.6s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes hotPulse {
+  0%, 100% { opacity: var(--base-op, 0.5); }
+  50%      { opacity: 1; }
+}
+
+/* corner chip */
+.scale-chip {
+  position: absolute;
+  top: 5.4%;
+  right: 3%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 11px/1 var(--mono);
+  letter-spacing: -.01em;
+  color: var(--fg-500);
+  background: var(--glass);
+  border: 1px solid var(--border-2);
+  padding: 7px 11px;
+  border-radius: 999px;
+  -webkit-backdrop-filter: var(--ticker-blur);
+          backdrop-filter: var(--ticker-blur);
+  z-index: 3;
+}
+.scale-chip strong { color: var(--fg-50); font-weight: 600; }
+.scale-chip em {
+  font-style: normal;
+  color: var(--fg-50);
+  font-weight: 600;
+}
+
+/* legend */
+.legend {
+  max-width: none;
+  margin: 36px 0 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+}
+.legend > div {
+  padding: 22px 20px;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.legend > div:last-child { border-right: none; }
+.legend .swatch {
+  width: 8px; height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.legend .name {
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-300);
+  margin-bottom: 12px;
+}
+.legend .num {
+  font: 600 26px/1 var(--mono);
+  letter-spacing: -.02em;
+  color: var(--fg-50);
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.legend .lbl {
+  font: 500 12px/1.3 var(--mono);
+  letter-spacing: -.01em;
+  color: var(--fg-500);
+}
+
+.foot {
+  max-width: none;
+  margin: 28px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 500 12px/1 var(--mono);
+  letter-spacing: -.01em;
+  color: var(--fg-500);
+}
+.foot .total {
+  font: 600 32px/1 var(--mono);
+  letter-spacing: -.03em;
+  color: var(--fg-50);
+}
+.foot .total em {
+  font-style: normal;
+  background: linear-gradient(to right, var(--fg-50) 20%, var(--fg-500) 90%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+@media (max-width: 880px) {
+  body { padding: 80px 18px 80px; }
+  h1 { font-size: 38px; }
+  .hero { min-height: auto; }
+  .hero-media { top: -56px; right: -18px; width: 110vw; height: 56vh; opacity: .85; }
+  .legend { grid-template-columns: repeat(2, 1fr); }
+  .legend > div:nth-child(2n) { border-right: none; }
+  .region-label .count { font-size: 20px; }
+  .foot { flex-direction: column; gap: 12px; align-items: flex-start; }
+}
+</style>
+</head>
+
+<body>
+<div class="controls">
+  <button class="legend-toggle" id="legendToggle" type="button" aria-label="Toggle breakdown section">
+    <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+    <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M10.7 5.1A9.9 9.9 0 0 1 12 5c6.5 0 10 7 10 7a13.2 13.2 0 0 1-1.7 2.5"/>
+      <path d="M6.6 6.6A13.3 13.3 0 0 0 2 12s3.5 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/>
+      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+      <path d="m2 2 20 20"/>
+    </svg>
+  </button>
+  <button class="style-toggle" id="styleToggle" type="button" aria-label="Toggle visual style">
+    <svg class="icon-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M15 3h6v6"/>
+      <path d="M9 21H3v-6"/>
+      <path d="M21 3l-7 7"/>
+      <path d="M3 21l7-7"/>
+    </svg>
+    <svg class="icon-solid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="4" y="4" width="16" height="16" rx="2.5"/>
+    </svg>
+  </button>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+    </svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+    </svg>
+  </button>
+</div>
+
+<div class="wrap">
+
+<div class="hero">
+  <div class="hero-text">
+    <header>
+      <span class="eyebrow">Coverage</span>
+      <h1>One API. <span class="accent">Every symbol.</span></h1>
+      <p>1.5 million tickers across stocks, options, futures, forex, and crypto. One key, one endpoint, one schema &mdash; every square is a symbol we cover.</p>
+    </header>
+
+    <div class="cta-row">
+      <a class="btn primary" href="#">Get your API key <span class="arrow">→</span></a>
+      <a class="btn secondary" href="#">Read the docs <span class="kbd">⌘ K</span></a>
+    </div>
+  </div>
+  <div class="hero-media">
+    <img src="exp.jpg" alt="" aria-hidden="true">
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <span class="scale-chip"><strong>Each square</strong>&nbsp;=&nbsp;<em>1 symbol</em></span>
+
+  <svg viewBox="0 0 1200 520" preserveAspectRatio="xMidYMid meet" id="mosaic"></svg>
+
+  <div class="region-label" style="top: 5.58%; left: 2.75%; --c: var(--c-stocks);">
+    <div class="head">
+      <span class="head-label">Stocks</span>
+    </div>
+    <div class="ico-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M18.6 2.40002C18.1226 2.40002 17.6648 2.58967 17.3272 2.92723C16.9897 3.2648 16.8 3.72263 16.8 4.20002V19.8C16.8 20.2774 16.9897 20.7353 17.3272 21.0728C17.6648 21.4104 18.1226 21.6 18.6 21.6H19.8C20.2774 21.6 20.7353 21.4104 21.0728 21.0728C21.4104 20.7353 21.6 20.2774 21.6 19.8V4.20002C21.6 3.72263 21.4104 3.2648 21.0728 2.92723C20.7353 2.58967 20.2774 2.40002 19.8 2.40002H18.6ZM11.4 7.20002C10.9226 7.20002 10.4648 7.38967 10.1272 7.72723C9.78967 8.0648 9.60002 8.52263 9.60002 9.00002V19.8C9.60002 20.2774 9.78967 20.7353 10.1272 21.0728C10.4648 21.4104 10.9226 21.6 11.4 21.6H12.6C13.0774 21.6 13.5353 21.4104 13.8728 21.0728C14.2104 20.7353 14.4 20.2774 14.4 19.8V9.00002C14.4 8.52263 14.2104 8.0648 13.8728 7.72723C13.5353 7.38967 13.0774 7.20002 12.6 7.20002H11.4ZM4.20002 12C3.72263 12 3.2648 12.1897 2.92723 12.5272C2.58967 12.8648 2.40002 13.3226 2.40002 13.8V19.8C2.40002 20.2774 2.58967 20.7353 2.92723 21.0728C3.2648 21.4104 3.72263 21.6 4.20002 21.6H5.40002C5.87741 21.6 6.33525 21.4104 6.67282 21.0728C7.01038 20.7353 7.20002 20.2774 7.20002 19.8V13.8C7.20002 13.3226 7.01038 12.8648 6.67282 12.5272C6.33525 12.1897 5.87741 12 5.40002 12H4.20002Z" fill="currentColor"/></svg></div>
+    <div class="count">48,250</div>
+    <div class="sub">us tickers · etfs · adrs</div>
+  </div>
+
+  <div class="region-label" style="top: 5.58%; left: 42.75%; --c: var(--c-options);">
+    <div class="head">
+      <span class="head-label">Options</span>
+    </div>
+    <div class="ico-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2.40002 5.40002C2.40002 4.60438 2.71609 3.84131 3.2787 3.2787C3.84131 2.71609 4.60438 2.40002 5.40002 2.40002H18.6C19.3957 2.40002 20.1587 2.71609 20.7213 3.2787C21.284 3.84131 21.6 4.60438 21.6 5.40002C21.6 6.19567 21.284 6.95874 20.7213 7.52134C20.1587 8.08395 19.3957 8.40002 18.6 8.40002H5.40002C4.60438 8.40002 3.84131 8.08395 3.2787 7.52134C2.71609 6.95874 2.40002 6.19567 2.40002 5.40002ZM3.30002 10.8996C3.06133 10.8996 2.83241 10.9944 2.66363 11.1632C2.49485 11.332 2.40002 11.5609 2.40002 11.7996C2.40002 12.0383 2.49485 12.2672 2.66363 12.436C2.83241 12.6048 3.06133 12.6996 3.30002 12.6996H20.7C20.9387 12.6996 21.1676 12.6048 21.3364 12.436C21.5052 12.2672 21.6 12.0383 21.6 11.7996C21.6 11.5609 21.5052 11.332 21.3364 11.1632C21.1676 10.9944 20.9387 10.8996 20.7 10.8996H3.30002ZM3.30002 15.1956C3.06133 15.1956 2.83241 15.2904 2.66363 15.4592C2.49485 15.628 2.40002 15.8569 2.40002 16.0956C2.40002 16.3343 2.49485 16.5632 2.66363 16.732C2.83241 16.9008 3.06133 16.9956 3.30002 16.9956H20.7C20.9387 16.9956 21.1676 16.9008 21.3364 16.732C21.5052 16.5632 21.6 16.3343 21.6 16.0956C21.6 15.8569 21.5052 15.628 21.3364 15.4592C21.1676 15.2904 20.9387 15.1956 20.7 15.1956H3.30002ZM3.30002 19.5C3.06133 19.5 2.83241 19.5948 2.66363 19.7636C2.49485 19.9324 2.40002 20.1613 2.40002 20.4C2.40002 20.6387 2.49485 20.8676 2.66363 21.0364C2.83241 21.2052 3.06133 21.3 3.30002 21.3H20.7C20.9387 21.3 21.1676 21.2052 21.3364 21.0364C21.5052 20.8676 21.6 20.6387 21.6 20.4C21.6 20.1613 21.5052 19.9324 21.3364 19.7636C21.1676 19.5948 20.9387 19.5 20.7 19.5H3.30002Z" fill="currentColor"/></svg></div>
+    <div class="count">1,420,000</div>
+    <div class="sub">active contracts · all strikes</div>
+  </div>
+
+  <div class="region-label" style="top: 49.42%; left: 2.75%; --c: var(--c-indices);">
+    <div class="head">
+      <span class="head-label">Indices</span>
+    </div>
+    <div class="ico-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.8352 15.444L2.8452 16.0236C2.70979 16.103 2.5975 16.2164 2.51947 16.3526C2.44144 16.4888 2.40039 16.643 2.40039 16.8C2.40039 16.957 2.44144 17.1112 2.51947 17.2474C2.5975 17.3836 2.70979 17.497 2.8452 17.5764L11.5452 22.6764C11.6831 22.7572 11.8401 22.7998 12 22.7998C12.1599 22.7998 12.3168 22.7572 12.4548 22.6764L21.1548 17.5764C21.2902 17.497 21.4025 17.3836 21.4805 17.2474C21.5585 17.1112 21.5996 16.957 21.5996 16.8C21.5996 16.643 21.5585 16.4888 21.4805 16.3526C21.4025 16.2164 21.2902 16.103 21.1548 16.0236L20.1648 15.4428L13.3656 19.4292C12.9515 19.672 12.4801 19.8 12 19.8C11.5199 19.8 11.0485 19.672 10.6344 19.4292L3.8352 15.444Z" fill="currentColor"/><path d="M3.8352 10.644L2.8452 11.2236C2.70979 11.303 2.5975 11.4164 2.51947 11.5526C2.44144 11.6888 2.40039 11.8431 2.40039 12C2.40039 12.157 2.44144 12.3112 2.51947 12.4474C2.5975 12.5836 2.70979 12.697 2.8452 12.7764L11.5452 17.8764C11.6831 17.9572 11.8401 17.9998 12 17.9998C12.1599 17.9998 12.3168 17.9572 12.4548 17.8764L21.1548 12.7764C21.2902 12.697 21.4025 12.5836 21.4805 12.4474C21.5585 12.3112 21.5996 12.157 21.5996 12C21.5996 11.8431 21.5585 11.6888 21.4805 11.5526C21.4025 11.4164 21.2902 11.303 21.1548 11.2236L20.1648 10.6428L13.3656 14.6292C12.9515 14.872 12.4801 15 12 15C11.5199 15 11.0485 14.872 10.6344 14.6292L3.8352 10.644Z" fill="currentColor"/><path d="M12.456 1.3236C12.3177 1.24236 12.1603 1.19952 12 1.19952C11.8396 1.19952 11.6822 1.24236 11.544 1.3236L2.84397 6.4236C2.70857 6.50298 2.59628 6.61641 2.51825 6.7526C2.44022 6.8888 2.39917 7.04303 2.39917 7.2C2.39917 7.35696 2.44022 7.51119 2.51825 7.64739C2.59628 7.78359 2.70857 7.89701 2.84397 7.9764L11.544 13.0764C11.6822 13.1576 11.8396 13.2005 12 13.2005C12.1603 13.2005 12.3177 13.1576 12.456 13.0764L21.156 7.9764C21.2914 7.89701 21.4037 7.78359 21.4817 7.64739C21.5597 7.51119 21.6008 7.35696 21.6008 7.2C21.6008 7.04303 21.5597 6.8888 21.4817 6.7526C21.4037 6.61641 21.2914 6.50298 21.156 6.4236L12.456 1.3236Z" fill="currentColor"/></svg></div>
+    <div class="count">8,400</div>
+    <div class="sub">benchmarks · sectors · custom</div>
+  </div>
+
+  <div class="region-label" style="top: 68.65%; left: 42.75%; --c: var(--c-futures);">
+    <div class="head">
+      <span class="head-label">Futures</span>
+    </div>
+    <div class="ico-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M3.94555 5.78157C3.67281 5.61318 3.36005 5.52068 3.03959 5.51362C2.71913 5.50656 2.4026 5.5852 2.1227 5.74142C1.84281 5.89764 1.60971 6.12576 1.44749 6.40222C1.28527 6.67867 1.19981 6.99343 1.19995 7.31397V16.686C1.20002 17.0064 1.28564 17.321 1.44794 17.5973C1.61025 17.8736 1.84337 18.1015 2.12323 18.2576C2.40308 18.4137 2.71953 18.4922 3.03989 18.4851C3.36024 18.478 3.67289 18.3855 3.94555 18.2172L11.5332 13.5312C11.7192 13.416 11.8752 13.2756 12 13.1184V16.686C12 17.0064 12.0856 17.321 12.2479 17.5973C12.4103 17.8736 12.6434 18.1015 12.9232 18.2576C13.2031 18.4137 13.5195 18.4922 13.8399 18.4851C14.1602 18.478 14.4729 18.3855 14.7456 18.2172L22.3332 13.5312C22.5942 13.3699 22.8096 13.1445 22.959 12.8765C23.1084 12.6085 23.1869 12.3068 23.1869 12C23.1869 11.6931 23.1084 11.3914 22.959 11.1234C22.8096 10.8554 22.5942 10.6301 22.3332 10.4688L14.7456 5.78157C14.4728 5.61318 14.16 5.52068 13.8396 5.51362C13.5191 5.50656 13.2026 5.5852 12.9227 5.74142C12.6428 5.89764 12.4097 6.12576 12.2475 6.40222C12.0853 6.67867 11.9998 6.99343 12 7.31397V10.8804C11.8693 10.7172 11.7114 10.5779 11.5332 10.4688L3.94555 5.78157Z" fill="currentColor"/></svg></div>
+    <div class="count">5,200</div>
+    <div class="sub">contracts · cme · ice</div>
+  </div>
+
+  <div class="region-label" style="top: 68.65%; left: 76.75%; --c: var(--c-currencies);">
+    <div class="head">
+      <span class="head-label">Currencies</span>
+    </div>
+    <div class="ico-row"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 21.6C14.5461 21.6 16.9879 20.5886 18.7883 18.7883C20.5886 16.9879 21.6 14.5461 21.6 12C21.6 9.45395 20.5886 7.01215 18.7883 5.2118C16.9879 3.41145 14.5461 2.40002 12 2.40002C9.45395 2.40002 7.01215 3.41145 5.2118 5.2118C3.41145 7.01215 2.40002 9.45395 2.40002 12C2.40002 14.5461 3.41145 16.9879 5.2118 18.7883C7.01215 20.5886 9.45395 21.6 12 21.6ZM10.4784 7.47842C10.757 7.19976 11.0878 6.97872 11.4518 6.8279C11.8158 6.67709 12.206 6.59946 12.6 6.59946C12.9941 6.59946 13.3842 6.67709 13.7483 6.8279C14.1123 6.97872 14.443 7.19976 14.7216 7.47842C14.804 7.56685 14.9034 7.63777 15.0138 7.68696C15.1242 7.73615 15.2434 7.7626 15.3642 7.76473C15.485 7.76687 15.6051 7.74464 15.7171 7.69937C15.8292 7.65411 15.931 7.58673 16.0165 7.50127C16.1019 7.41581 16.1693 7.31401 16.2146 7.20194C16.2598 7.08988 16.2821 6.96984 16.2799 6.849C16.2778 6.72815 16.2514 6.60898 16.2022 6.49858C16.153 6.38818 16.082 6.28882 15.9936 6.20642C15.3223 5.53534 14.4672 5.07835 13.5362 4.89322C12.6052 4.7081 11.6402 4.80315 10.7633 5.16637C9.88632 5.52959 9.13674 6.14466 8.6093 6.93382C8.08185 7.72299 7.80023 8.65082 7.80002 9.60002V9.79802C7.80002 10.2348 7.84082 10.6716 7.92002 11.1H7.50002C7.26133 11.1 7.03241 11.1948 6.86363 11.3636C6.69485 11.5324 6.60002 11.7613 6.60002 12C6.60002 12.2387 6.69485 12.4676 6.86363 12.6364C7.03241 12.8052 7.26133 12.9 7.50002 12.9H8.38442C8.61124 14.1452 8.45778 15.4298 7.94402 16.5864L7.87802 16.734C7.81027 16.8863 7.78614 17.0544 7.80831 17.2196C7.83048 17.3848 7.89809 17.5406 8.0036 17.6696C8.10911 17.7986 8.24837 17.8958 8.40588 17.9503C8.56338 18.0049 8.73292 18.0146 8.89562 17.9784L10.422 17.6388C11.0569 17.4978 11.7159 17.5064 12.3468 17.664C13.3009 17.9026 14.2991 17.9026 15.2532 17.664L16.4172 17.3736C16.6489 17.3159 16.8482 17.1684 16.9712 16.9637C17.0941 16.7591 17.1308 16.5139 17.073 16.2822C17.0153 16.0505 16.8678 15.8513 16.6631 15.7283C16.4585 15.6053 16.2133 15.5687 15.9816 15.6264L14.8164 15.918C14.1491 16.0849 13.4509 16.0849 12.7836 15.918C11.8958 15.696 10.9689 15.6804 10.074 15.8724C10.302 14.8992 10.3464 13.8912 10.2072 12.9H11.7C11.9387 12.9 12.1676 12.8052 12.3364 12.6364C12.5052 12.4676 12.6 12.2387 12.6 12C12.6 11.7613 12.5052 11.5324 12.3364 11.3636C12.1676 11.1948 11.9387 11.1 11.7 11.1H9.76322C9.65486 10.6745 9.60004 10.2371 9.60002 9.79802V9.60002C9.60002 8.83082 9.89283 8.06402 10.4784 7.47842Z" fill="currentColor"/></svg></div>
+    <div class="count">168</div>
+    <div class="sub">pairs · 24h</div>
+  </div>
+</div>
+
+<div class="legend">
+  <div>
+    <div class="name"><span class="swatch" style="background:var(--c-stocks);"></span>Stocks</div>
+    <div class="num">48,250</div>
+    <div class="lbl">3.2% of mosaic</div>
+  </div>
+  <div>
+    <div class="name"><span class="swatch" style="background:var(--c-options);"></span>Options</div>
+    <div class="num">1.42<span style="font-size:18px;color:var(--fg-500);font-weight:500;margin-left:2px;">M</span></div>
+    <div class="lbl">94.2% of mosaic</div>
+  </div>
+  <div>
+    <div class="name"><span class="swatch" style="background:var(--c-indices);"></span>Indices</div>
+    <div class="num">8,400</div>
+    <div class="lbl">0.6% of mosaic</div>
+  </div>
+  <div>
+    <div class="name"><span class="swatch" style="background:var(--c-futures);"></span>Futures</div>
+    <div class="num">5,200</div>
+    <div class="lbl">0.3% of mosaic</div>
+  </div>
+  <div>
+    <div class="name"><span class="swatch" style="background:var(--c-currencies);"></span>Currencies</div>
+    <div class="num">168</div>
+    <div class="lbl">0.01% of mosaic</div>
+  </div>
+</div>
+
+<div class="foot">
+  <span>Each tile drawn proportional to the catalog &middot; light scaling preserves visibility of smaller classes.</span>
+  <div class="total"><em>1.48 M+</em> total</div>
+</div>
+
+</div>
+
+<script>
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const mosaic = document.getElementById('mosaic');
+
+function readColor(varName) {
+  return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+}
+
+const regions = [
+  { x: 24,  y: 20,  w: 472, h: 220, varName: '--c-stocks',     hotPct: 0.04 },
+  { x: 504, y: 20,  w: 672, h: 320, varName: '--c-options',    hotPct: 0.05 },
+  { x: 24,  y: 248, w: 472, h: 252, varName: '--c-indices',    hotPct: 0.05 },
+  { x: 504, y: 348, w: 400, h: 152, varName: '--c-futures',    hotPct: 0.06 },
+  { x: 912, y: 348, w: 264, h: 152, varName: '--c-currencies', hotPct: 0.08 }
+];
+
+const TILE = 7;
+const GAP  = 2;
+const STEP = TILE + GAP;
+
+const rng = (() => { let s = 99173; return () => { s = (s*9301 + 49297) % 233280; return s/233280; }; })();
+
+function buildMosaic() {
+  mosaic.innerHTML = '';
+  regions.forEach(reg => {
+    const color = readColor(reg.varName);
+    const cols = Math.floor(reg.w / STEP);
+    const rows = Math.floor(reg.h / STEP);
+    const offX = reg.x + (reg.w - cols * STEP) / 2;
+    const offY = reg.y + (reg.h - rows * STEP) / 2;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const rect = document.createElementNS(SVG_NS, 'rect');
+        rect.setAttribute('x', (offX + c * STEP).toFixed(1));
+        rect.setAttribute('y', (offY + r * STEP).toFixed(1));
+        rect.setAttribute('width',  TILE);
+        rect.setAttribute('height', TILE);
+        rect.setAttribute('rx', 1);
+
+        const baseOp = 0.45 + rng() * 0.5;
+        const isHot  = rng() < reg.hotPct;
+
+        rect.setAttribute('fill', color);
+        rect.setAttribute('opacity', isHot ? 1 : baseOp.toFixed(2));
+        rect.classList.add('tile');
+
+        if (isHot) {
+          rect.classList.add('hot');
+          rect.style.setProperty('--base-op', '0.78');
+          rect.style.setProperty('--dur',   (1.8 + rng() * 2.6).toFixed(2) + 's');
+          rect.style.setProperty('--delay', (-rng() * 3).toFixed(2) + 's');
+        }
+        mosaic.appendChild(rect);
+      }
+    }
+  });
+}
+
+buildMosaic();
+
+function flashTile() {
+  const tiles = mosaic.querySelectorAll('.tile');
+  if (!tiles.length) return scheduleFlash();
+  const t = tiles[Math.floor(rng() * tiles.length)];
+  if (!t || t.dataset.flashing) return scheduleFlash();
+  t.dataset.flashing = '1';
+  const orig = t.getAttribute('opacity');
+  const origFill = t.getAttribute('fill');
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  t.setAttribute('opacity', '1');
+  t.setAttribute('fill', isDark ? '#ffffff' : '#0a0a0a');
+  setTimeout(() => {
+    t.setAttribute('opacity', orig);
+    t.setAttribute('fill', origFill);
+    delete t.dataset.flashing;
+  }, 180);
+  scheduleFlash();
+}
+function scheduleFlash() {
+  setTimeout(flashTile, 60 + rng() * 200);
+}
+scheduleFlash();
+
+const themeBtn = document.getElementById('themeToggle');
+const stored = localStorage.getItem('massive-theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+if (stored === 'dark' || (!stored && prefersDark)) {
+  document.documentElement.setAttribute('data-theme', 'dark');
+}
+themeBtn.addEventListener('click', () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('massive-theme', 'light');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('massive-theme', 'dark');
+  }
+  buildMosaic();
+});
+
+const legendBtn = document.getElementById('legendToggle');
+const storedLegend = localStorage.getItem('massive-legend');
+if (storedLegend === 'off') {
+  document.documentElement.setAttribute('data-legend', 'off');
+}
+legendBtn.addEventListener('click', () => {
+  const off = document.documentElement.getAttribute('data-legend') === 'off';
+  if (off) {
+    document.documentElement.removeAttribute('data-legend');
+    localStorage.setItem('massive-legend', 'on');
+  } else {
+    document.documentElement.setAttribute('data-legend', 'off');
+    localStorage.setItem('massive-legend', 'off');
+  }
+});
+
+const styleBtn = document.getElementById('styleToggle');
+const storedStyle = localStorage.getItem('massive-style');
+if (storedStyle === 'solid') {
+  document.documentElement.setAttribute('data-style', 'solid');
+}
+styleBtn.addEventListener('click', () => {
+  const isSolid = document.documentElement.getAttribute('data-style') === 'solid';
+  if (isSolid) {
+    document.documentElement.removeAttribute('data-style');
+    localStorage.setItem('massive-style', 'glass');
+  } else {
+    document.documentElement.setAttribute('data-style', 'solid');
+    localStorage.setItem('massive-style', 'solid');
+  }
+});
+</script>
+
+</body>
+</html>
