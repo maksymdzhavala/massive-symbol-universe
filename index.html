@@ -429,6 +429,9 @@ header p {
 }
 
 /* hot tile pulse */
+.tile { transform-box: fill-box; transform-origin: center; transition: transform .32s cubic-bezier(.4,0,.2,1); }
+.tile.flip-down { transform: scaleY(0); }
+.tile.in-logo { animation: none !important; }
 .tile.hot {
   animation: hotPulse var(--dur, 2.6s) ease-in-out infinite;
   animation-delay: var(--delay, 0s);
@@ -702,20 +705,22 @@ const regions = [
   { x: 912, y: 348, w: 264, h: 152, varName: '--c-currencies', hotPct: 0.08 }
 ];
 
-const TILE = 7;
-const GAP  = 2;
+const TILE = 4;
+const GAP  = 1;
 const STEP = TILE + GAP;
 
 const rng = (() => { let s = 99173; return () => { s = (s*9301 + 49297) % 233280; return s/233280; }; })();
 
 function buildMosaic() {
   mosaic.innerHTML = '';
-  regions.forEach(reg => {
+  regions.forEach((reg, regionIndex) => {
     const color = readColor(reg.varName);
     const cols = Math.floor(reg.w / STEP);
     const rows = Math.floor(reg.h / STEP);
     const offX = reg.x + (reg.w - cols * STEP) / 2;
     const offY = reg.y + (reg.h - rows * STEP) / 2;
+    reg.cols = cols;
+    reg.rows = rows;
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
@@ -725,6 +730,9 @@ function buildMosaic() {
         rect.setAttribute('width',  TILE);
         rect.setAttribute('height', TILE);
         rect.setAttribute('rx', 1);
+        rect.dataset.region = regionIndex;
+        rect.dataset.row = r;
+        rect.dataset.col = c;
 
         const baseOp = 0.45 + rng() * 0.5;
         const isHot  = rng() < reg.hotPct;
@@ -752,6 +760,7 @@ function flashTile() {
   if (!tiles.length) return scheduleFlash();
   const t = tiles[Math.floor(rng() * tiles.length)];
   if (!t || t.dataset.flashing) return scheduleFlash();
+  if (t.classList.contains('in-logo')) return scheduleFlash();
   t.dataset.flashing = '1';
   const orig = t.getAttribute('opacity');
   const origFill = t.getAttribute('fill');
@@ -819,6 +828,141 @@ styleBtn.addEventListener('click', () => {
     localStorage.setItem('massive-style', 'solid');
   }
 });
+
+/* logo flip easter egg */
+const LOGOS = [
+  { name: 'AAPL',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="__FG__" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>' },
+  { name: 'TSLA',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 254.584 253.502"><g transform="translate(-45.84,-64.297)" fill="#e82127"><path d="M 173.146,317.299 208.622,117.78 c 33.815,0 44.481,3.708 46.021,18.843 0,0 22.684,-8.458 34.125,-25.636 C 244.122,90.299 199.263,89.366 199.263,89.366 l -26.176,31.882 0.059,-0.004 -26.176,-31.883 c 0,0 -44.86,0.934 -89.5,21.622 11.431,17.178 34.124,25.636 34.124,25.636 1.549,-15.136 12.202,-18.844 45.79,-18.868 l 35.762,199.548"/><path d="m 173.132,80.157 c 36.09,-0.276 77.399,5.583 119.687,24.014 5.652,-10.173 7.105,-14.669 7.105,-14.669 C 253.697,71.213 210.406,64.954 173.127,64.797 135.85,64.954 92.561,71.214 46.34,89.502 c 0,0 2.062,5.538 7.1,14.669 42.28,-18.431 83.596,-24.29 119.687,-24.014 h 0.005"/></g></svg>' },
+  { name: 'MSFT',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#F25022" d="M0 0h11.4v11.4H0z"/><path fill="#7FBA00" d="M12.6 0H24v11.4H12.6z"/><path fill="#00A4EF" d="M0 12.6h11.4V24H0z"/><path fill="#FFB900" d="M12.6 12.6H24V24H12.6z"/></svg>' },
+  { name: 'NVDA',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#76B900" d="M8.948 8.798v-1.43a6.7 6.7 0 0 1 .424-.018c3.922-.123 6.493 3.374 6.493 3.374s-2.774 3.851-5.75 3.851a4.1 4.1 0 0 1-1.167-.168v-4.376c1.523.184 1.83.857 2.744 2.387l2.037-1.715s-1.487-1.95-3.992-1.95a6.7 6.7 0 0 0-.789.045m0-4.733v2.134l.424-.027c5.45-.184 9.01 4.47 9.01 4.47s-4.085 4.964-8.334 4.964c-.379 0-.733-.036-1.07-.09v1.32c.282.036.572.063.88.063 3.956 0 6.815-2.02 9.585-4.408.46.37 2.343 1.265 2.732 1.66-2.633 2.204-8.762 3.978-12.253 3.978-.336 0-.66-.018-.974-.054v1.85h15.052V4.066H8.948zm0 10.32v1.13c-3.654-.652-4.668-4.452-4.668-4.452s1.755-1.942 4.668-2.258v1.239l-.009-.001c-1.529-.184-2.726.972-2.726 2.726 0 1.745.973 2.866 2.735 2.616zM2.28 11.793s2.166-3.2 6.668-3.545V7.044C3.96 7.448 0 11.523 0 11.523s2.245 6.497 8.948 7.124v-1.265c-4.917-.61-6.668-5.589-6.668-5.589z"/></svg>' },
+  { name: 'GOOGL', svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>' },
+  { name: 'META',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 290 191"><defs><linearGradient id="meta-g1" x1="61" y1="117" x2="259" y2="127" gradientUnits="userSpaceOnUse"><stop stop-color="#0064e1" offset="0"/><stop stop-color="#0064e1" offset=".4"/><stop stop-color="#0073ee" offset=".83"/><stop stop-color="#0082fb" offset="1"/></linearGradient><linearGradient id="meta-g2" x1="45" y1="139" x2="45" y2="66" gradientUnits="userSpaceOnUse"><stop stop-color="#0082fb" offset="0"/><stop stop-color="#0064e0" offset="1"/></linearGradient></defs><path fill="#0081fb" d="m31.06,125.96c0,10.98 2.41,19.41 5.56,24.51 4.13,6.68 10.29,9.51 16.57,9.51 8.1,0 15.51-2.01 29.79-21.76 11.44-15.83 24.92-38.05 33.99-51.98l15.36-23.6c10.67-16.39 23.02-34.61 37.18-46.96 11.56-10.08 24.03-15.68 36.58-15.68 21.07,0 41.14,12.21 56.5,35.11 16.81,25.08 24.97,56.67 24.97,89.27 0,19.38-3.82,33.62-10.32,44.87-6.28,10.88-18.52,21.75-39.11,21.75l0-31.02c17.63,0 22.03-16.2 22.03-34.74 0-26.42-6.16-55.74-19.73-76.69-9.63-14.86-22.11-23.94-35.84-23.94-14.85,0-26.8,11.2-40.23,31.17-7.14,10.61-14.47,23.54-22.7,38.13l-9.06,16.05c-18.2,32.27-22.81,39.62-31.91,51.75-15.95,21.24-29.57,29.29-47.5,29.29-21.27,0-34.72-9.21-43.05-23.09-6.8-11.31-10.14-26.15-10.14-43.06z"/><path fill="url(#meta-g1)" d="m24.49,37.3c14.24-21.95 34.79-37.3 58.36-37.3 13.65,0 27.22,4.04 41.39,15.61 15.5,12.65 32.02,33.48 52.63,67.81l7.39,12.32c17.84,29.72 27.99,45.01 33.93,52.22 7.64,9.26 12.99,12.02 19.94,12.02 17.63,0 22.03-16.2 22.03-34.74l27.4-.86c0,19.38-3.82,33.62-10.32,44.87-6.28,10.88-18.52,21.75-39.11,21.75-12.8,0-24.14-2.78-36.68-14.61-9.64-9.08-20.91-25.21-29.58-39.71l-25.79-43.08c-12.94-21.62-24.81-37.74-31.68-45.04-7.39-7.85-16.89-17.33-32.05-17.33-12.27,0-22.69,8.61-31.41,21.78z"/><path fill="url(#meta-g2)" d="m82.35,31.23c-12.27,0-22.69,8.61-31.41,21.78-12.33,18.61-19.88,46.33-19.88,72.95 0,10.98 2.41,19.41 5.56,24.51l-26.48,17.44c-6.8-11.31-10.14-26.15-10.14-43.06 0-30.75 8.44-62.8 24.49-87.55 14.24-21.95 34.79-37.3 58.36-37.3z"/></svg>' },
+  { name: 'AMZN',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="2.167 .438 251.038 259.969"><g fill-rule="evenodd"><path d="m221.503 210.324c-105.235 50.083-170.545 8.18-212.352-17.271-2.587-1.604-6.984.375-3.169 4.757 13.928 16.888 59.573 57.593 119.153 57.593 59.621 0 95.09-32.532 99.527-38.207 4.407-5.627 1.294-8.731-3.16-6.872zm29.555-16.322c-2.826-3.68-17.184-4.366-26.22-3.256-9.05 1.078-22.634 6.609-21.453 9.93.606 1.244 1.843.686 8.06.127 6.234-.622 23.698-2.826 27.337 1.931 3.656 4.79-5.57 27.608-7.255 31.288-1.628 3.68.622 4.629 3.68 2.178 3.016-2.45 8.476-8.795 12.14-17.774 3.639-9.028 5.858-21.622 3.71-24.424z" fill="#f90" fill-rule="nonzero"/><path d="m150.744 108.13c0 13.141.332 24.1-6.31 35.77-5.361 9.489-13.853 15.324-23.341 15.324-12.952 0-20.495-9.868-20.495-24.432 0-28.75 25.76-33.968 50.146-33.968zm34.015 82.216c-2.23 1.992-5.456 2.135-7.97.806-11.196-9.298-13.189-13.615-19.356-22.487-18.502 18.882-31.596 24.527-55.601 24.527-28.37 0-50.478-17.506-50.478-52.565 0-27.373 14.85-46.018 35.96-55.126 18.313-8.066 43.884-9.489 63.43-11.718v-4.365c0-8.018.616-17.506-4.08-24.432-4.128-6.215-12.003-8.777-18.93-8.777-12.856 0-24.337 6.594-27.136 20.257-.57 3.037-2.799 6.026-5.835 6.168l-32.735-3.51c-2.751-.618-5.787-2.847-5.028-7.07 7.543-39.66 43.36-51.616 75.43-51.616 16.415 0 37.858 4.365 50.81 16.795 16.415 15.323 14.849 35.77 14.849 58.02v52.565c0 15.798 6.547 22.724 12.714 31.264 2.182 3.036 2.657 6.69-.095 8.966-6.879 5.74-19.119 16.415-25.855 22.393l-.095-.095" fill="__FG__"/></g></svg>' }
+];
+
+const wait = ms => new Promise(r => setTimeout(r, ms));
+let logoIdx = 0;
+let regionRotation = 0;
+let logoBusy = false;
+
+function themeFG() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? '#fafafa' : '#0a0a0a';
+}
+
+async function playLogoFlip() {
+  if (logoBusy) return scheduleNextLogo();
+  logoBusy = true;
+
+  const logoRegions = regions.filter(r => r.varName !== '--c-currencies');
+  const reg = logoRegions[regionRotation % logoRegions.length];
+  regionRotation++;
+  const logo = LOGOS[logoIdx % LOGOS.length];
+  logoIdx++;
+
+  const side = 12;
+  const clusterCols = side;
+  const clusterRows = side;
+  const edgePad = 2;
+  const innerPad = 2;
+  const startCol = reg.cols - clusterCols - edgePad;
+  const startRow = reg.rows - clusterRows - edgePad;
+  const regionAttr = regions.indexOf(reg);
+
+  const tilesGrid = [];
+  const flat = [];
+  for (let r = 0; r < clusterRows; r++) {
+    const row = [];
+    for (let c = 0; c < clusterCols; c++) {
+      const t = mosaic.querySelector(`.tile[data-region="${regionAttr}"][data-row="${startRow + r}"][data-col="${startCol + c}"]`);
+      row.push(t);
+      if (t) flat.push(t);
+    }
+    tilesGrid.push(row);
+  }
+  if (!flat.length) { logoBusy = false; return scheduleNextLogo(); }
+
+  const offX = reg.x + (reg.w - reg.cols * STEP) / 2;
+  const offY = reg.y + (reg.h - reg.rows * STEP) / 2;
+  const imgX = offX + (startCol + innerPad) * STEP;
+  const imgY = offY + (startRow + innerPad) * STEP;
+  const imgW = (clusterCols - innerPad * 2) * STEP;
+  const imgH = (clusterRows - innerPad * 2) * STEP;
+
+  const DOWN = 300, UP = 300, HOLD = 1700, STAGGER = 12, FADE = 350;
+  const maxDelay = (clusterCols - 1) * STAGGER;
+
+  flat.forEach(t => t.classList.add('in-logo'));
+
+  const setDelays = forward => {
+    for (let c = 0; c < clusterCols; c++) {
+      const d = (forward ? c : (clusterCols - 1 - c)) * STAGGER;
+      for (let r = 0; r < clusterRows; r++) {
+        const t = tilesGrid[r][c];
+        if (t) t.style.transitionDelay = d + 'ms';
+      }
+    }
+  };
+
+  setDelays(true);
+  flat.forEach(t => t.classList.add('flip-down'));
+  await wait(DOWN + maxDelay);
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const dimOpacity = isDark ? 0.12 : 0.20;
+
+  const snap = flat.map(t => ({ el: t, fill: t.getAttribute('fill'), op: t.getAttribute('opacity') }));
+  flat.forEach(t => t.setAttribute('opacity', String(dimOpacity)));
+
+  setDelays(false);
+  flat.forEach(t => t.classList.remove('flip-down'));
+  await wait(UP + maxDelay);
+
+  const svgMarkup = logo.svg.replace(/__FG__/g, themeFG());
+  const img = document.createElementNS(SVG_NS, 'image');
+  img.setAttribute('x', imgX.toFixed(1));
+  img.setAttribute('y', imgY.toFixed(1));
+  img.setAttribute('width', imgW.toFixed(1));
+  img.setAttribute('height', imgH.toFixed(1));
+  img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  img.setAttribute('href', 'data:image/svg+xml;utf8,' + encodeURIComponent(svgMarkup));
+  img.style.opacity = '0';
+  img.style.transition = `opacity ${FADE}ms ease`;
+  mosaic.appendChild(img);
+  await new Promise(r => requestAnimationFrame(r));
+  img.style.opacity = '1';
+
+  await wait(FADE + HOLD);
+
+  img.style.opacity = '0';
+  await wait(FADE + 20);
+  img.remove();
+
+  setDelays(true);
+  flat.forEach(t => t.classList.add('flip-down'));
+  await wait(DOWN + maxDelay);
+
+  snap.forEach(s => {
+    if (!s.el.isConnected) return;
+    s.el.setAttribute('fill', s.fill);
+    s.el.setAttribute('opacity', s.op);
+  });
+
+  setDelays(false);
+  flat.forEach(t => t.classList.remove('flip-down'));
+  await wait(UP + maxDelay + 60);
+
+  flat.forEach(t => {
+    t.classList.remove('in-logo');
+    t.style.transitionDelay = '';
+  });
+  logoBusy = false;
+  scheduleNextLogo();
+}
+
+function scheduleNextLogo() {
+  setTimeout(playLogoFlip, 2500 + Math.random() * 2500);
+}
+setTimeout(playLogoFlip, 3000);
 </script>
 
 </body>
