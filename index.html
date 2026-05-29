@@ -879,6 +879,7 @@ function buildMosaic() {
 
 function buildLegendMosaics() {
   const cells = document.querySelectorAll('.legend > div');
+  const COLS = 80, ROWS = 28, HOT_PCT = 0.05;
   regions.forEach((reg, i) => {
     const cell = cells[i];
     if (!cell) return;
@@ -886,16 +887,18 @@ function buildLegendMosaics() {
     if (existing) existing.remove();
 
     const color = readColor(reg.varName);
-    const cols = reg.cols, rows = reg.rows;
+    let s = 99173;
+    const localRng = () => { s = (s*9301 + 49297) % 233280; return s/233280; };
+
     const container = document.createElement('div');
     container.className = 'region-mini';
 
     const svg = document.createElementNS(SVG_NS, 'svg');
-    svg.setAttribute('viewBox', `0 0 ${cols * STEP} ${rows * STEP}`);
+    svg.setAttribute('viewBox', `0 0 ${COLS * STEP} ${ROWS * STEP}`);
     svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
 
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
         const rect = document.createElementNS(SVG_NS, 'rect');
         rect.setAttribute('x', (c * STEP).toFixed(1));
         rect.setAttribute('y', (r * STEP).toFixed(1));
@@ -903,15 +906,15 @@ function buildLegendMosaics() {
         rect.setAttribute('height', TILE);
         rect.setAttribute('rx', 1);
         rect.setAttribute('fill', color);
-        const baseOp = 0.45 + rng() * 0.5;
-        const isHot = rng() < reg.hotPct;
+        const baseOp = 0.45 + localRng() * 0.5;
+        const isHot = localRng() < HOT_PCT;
         rect.setAttribute('opacity', isHot ? 1 : baseOp.toFixed(2));
         rect.classList.add('tile');
         if (isHot) {
           rect.classList.add('hot');
           rect.style.setProperty('--base-op', '0.78');
-          rect.style.setProperty('--dur', (1.8 + rng() * 2.6).toFixed(2) + 's');
-          rect.style.setProperty('--delay', (-rng() * 3).toFixed(2) + 's');
+          rect.style.setProperty('--dur', (1.8 + localRng() * 2.6).toFixed(2) + 's');
+          rect.style.setProperty('--delay', (-localRng() * 3).toFixed(2) + 's');
         }
         svg.appendChild(rect);
       }
@@ -949,7 +952,10 @@ buildLegendMosaics();
 decorateLegendCells();
 
 function flashTile() {
-  const tiles = mosaic.querySelectorAll('.tile');
+  const isMobile = document.documentElement.classList.contains('mobile-mode');
+  const tiles = isMobile
+    ? document.querySelectorAll('.region-mini .tile')
+    : mosaic.querySelectorAll('.tile');
   if (!tiles.length) return scheduleFlash();
   const t = tiles[Math.floor(rng() * tiles.length)];
   if (!t || t.dataset.flashing) return scheduleFlash();
