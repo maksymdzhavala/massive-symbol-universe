@@ -963,18 +963,17 @@ function flashTile() {
   t.dataset.flashing = '1';
   const orig = t.getAttribute('opacity');
   const origFill = t.getAttribute('fill');
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   t.setAttribute('opacity', '1');
-  t.setAttribute('fill', isDark ? '#ffffff' : '#0a0a0a');
+  t.setAttribute('fill', '#ffffff');
   setTimeout(() => {
     t.setAttribute('opacity', orig);
     t.setAttribute('fill', origFill);
     delete t.dataset.flashing;
-  }, 180);
+  }, 240);
   scheduleFlash();
 }
 function scheduleFlash() {
-  setTimeout(flashTile, 60 + rng() * 200);
+  setTimeout(flashTile, 25 + rng() * 90);
 }
 scheduleFlash();
 
