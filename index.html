@@ -951,6 +951,8 @@ buildMosaic();
 buildLegendMosaics();
 decorateLegendCells();
 
+console.log('[symbol-universe] build', 'e59b630+', 'mobile-mode:', document.documentElement.classList.contains('mobile-mode'));
+
 function flashTile() {
   const isMobile = document.documentElement.classList.contains('mobile-mode');
   const tiles = isMobile
