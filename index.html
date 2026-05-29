@@ -865,9 +865,43 @@ async function playLogoFlip() {
   const innerPad = 2;
   const colRange = Math.max(0, reg.cols - clusterCols - edgePad * 2);
   const rowRange = Math.max(0, reg.rows - clusterRows - edgePad * 2);
-  const startCol = edgePad + Math.floor(Math.random() * (colRange + 1));
-  const startRow = edgePad + Math.floor(Math.random() * (rowRange + 1));
   const regionAttr = regions.indexOf(reg);
+
+  const offX = reg.x + (reg.w - reg.cols * STEP) / 2;
+  const offY = reg.y + (reg.h - reg.rows * STEP) / 2;
+  const imgW = (clusterCols - innerPad * 2) * STEP;
+  const imgH = (clusterRows - innerPad * 2) * STEP;
+
+  const labelEl = document.querySelectorAll('.region-label')[regionAttr];
+  let labelRect = null;
+  if (labelEl) {
+    const lr = labelEl.getBoundingClientRect();
+    const mr = mosaic.getBoundingClientRect();
+    if (mr.width && mr.height) {
+      const sx = 1200 / mr.width, sy = 520 / mr.height;
+      labelRect = {
+        x: (lr.left - mr.left) * sx,
+        y: (lr.top  - mr.top ) * sy,
+        w: lr.width  * sx,
+        h: lr.height * sy
+      };
+    }
+  }
+  const margin = STEP * 2;
+  let startCol = 0, startRow = 0;
+  for (let attempt = 0; attempt < 40; attempt++) {
+    startCol = edgePad + Math.floor(Math.random() * (colRange + 1));
+    startRow = edgePad + Math.floor(Math.random() * (rowRange + 1));
+    if (!labelRect) break;
+    const ix = offX + (startCol + innerPad) * STEP;
+    const iy = offY + (startRow + innerPad) * STEP;
+    const overlaps =
+      ix < labelRect.x + labelRect.w + margin &&
+      ix + imgW + margin > labelRect.x &&
+      iy < labelRect.y + labelRect.h + margin &&
+      iy + imgH + margin > labelRect.y;
+    if (!overlaps) break;
+  }
 
   const tilesGrid = [];
   const flat = [];
@@ -882,12 +916,8 @@ async function playLogoFlip() {
   }
   if (!flat.length) { logoBusy = false; return scheduleNextLogo(); }
 
-  const offX = reg.x + (reg.w - reg.cols * STEP) / 2;
-  const offY = reg.y + (reg.h - reg.rows * STEP) / 2;
   const imgX = offX + (startCol + innerPad) * STEP;
   const imgY = offY + (startRow + innerPad) * STEP;
-  const imgW = (clusterCols - innerPad * 2) * STEP;
-  const imgH = (clusterRows - innerPad * 2) * STEP;
 
   const FADE = 550, HOLD = 1700;
 
