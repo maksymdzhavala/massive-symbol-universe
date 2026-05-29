@@ -468,9 +468,9 @@ header p {
 
 /* legend */
 .legend {
+  display: none;
   max-width: none;
   margin: 36px 0 0;
-  display: grid;
   grid-template-columns: repeat(5, 1fr);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -560,6 +560,7 @@ html.mobile-mode .controls { top: 14px; right: 14px; gap: 8px; }
 html.mobile-mode .theme-toggle, html.mobile-mode .style-toggle, html.mobile-mode .viewport-toggle { width: 36px; height: 36px; }
 
 html.mobile-mode .legend {
+  display: grid;
   grid-template-columns: 1fr;
   border: none;
   background: transparent;
