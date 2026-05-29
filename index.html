@@ -863,8 +863,10 @@ async function playLogoFlip() {
   const clusterRows = side;
   const edgePad = 2;
   const innerPad = 2;
-  const startCol = reg.cols - clusterCols - edgePad;
-  const startRow = reg.rows - clusterRows - edgePad;
+  const colRange = Math.max(0, reg.cols - clusterCols - edgePad * 2);
+  const rowRange = Math.max(0, reg.rows - clusterRows - edgePad * 2);
+  const startCol = edgePad + Math.floor(Math.random() * (colRange + 1));
+  const startRow = edgePad + Math.floor(Math.random() * (rowRange + 1));
   const regionAttr = regions.indexOf(reg);
 
   const tilesGrid = [];
