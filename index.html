@@ -973,7 +973,9 @@ function flashTile() {
   scheduleFlash();
 }
 function scheduleFlash() {
-  setTimeout(flashTile, 25 + rng() * 90);
+  const isMobile = document.documentElement.classList.contains('mobile-mode');
+  const delay = isMobile ? (10 + rng() * 40) : (25 + rng() * 90);
+  setTimeout(flashTile, delay);
 }
 scheduleFlash();
 
