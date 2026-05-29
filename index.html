@@ -1080,7 +1080,7 @@ async function playLogoFlipMobile() {
   }
   if (!flat.length) return;
 
-  const FADE = 550, HOLD = 1700;
+  const FADE = 400, HOLD = 1200;
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const dimOpacity = isDark ? 0.12 : 0.20;
 
@@ -1191,7 +1191,7 @@ async function playLogoFlip() {
   const imgX = offX + (startCol + innerPad) * STEP;
   const imgY = offY + (startRow + innerPad) * STEP;
 
-  const FADE = 550, HOLD = 1700;
+  const FADE = 400, HOLD = 1200;
 
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const dimOpacity = isDark ? 0.12 : 0.20;
@@ -1230,9 +1230,9 @@ async function playLogoFlip() {
 }
 
 function scheduleNextLogo() {
-  setTimeout(playLogoFlip, 2500 + Math.random() * 2500);
+  setTimeout(playLogoFlip, 700 + Math.random() * 1200);
 }
-setTimeout(playLogoFlip, 3000);
+setTimeout(playLogoFlip, 1200);
 </script>
 
 </body>
