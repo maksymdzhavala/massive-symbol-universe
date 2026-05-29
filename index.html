@@ -1048,10 +1048,81 @@ function themeFG() {
   return document.documentElement.getAttribute('data-theme') === 'dark' ? '#fafafa' : '#0a0a0a';
 }
 
+async function playLogoFlipMobile() {
+  const logoRegions = regions.filter(r => r.varName !== '--c-currencies');
+  const reg = logoRegions[regionRotation % logoRegions.length];
+  regionRotation++;
+  const logo = LOGOS[logoIdx % LOGOS.length];
+  logoIdx++;
+
+  const regionIdx = regions.indexOf(reg);
+  const miniSvg = document.querySelectorAll('.region-mini svg')[regionIdx];
+  if (!miniSvg) return;
+
+  const COLS = 80, ROWS = 28;
+  const cluster = 12, innerPad = 2;
+  const startCol = 58 + Math.floor(Math.random() * 9);
+  const startRow = 2 + Math.floor(Math.random() * 13);
+
+  const imgX = (startCol + innerPad) * STEP;
+  const imgY = (startRow + innerPad) * STEP;
+  const imgW = (cluster - innerPad * 2) * STEP;
+  const imgH = (cluster - innerPad * 2) * STEP;
+
+  const allTiles = miniSvg.querySelectorAll('rect.tile');
+  const flat = [];
+  for (let r = 0; r < cluster; r++) {
+    for (let c = 0; c < cluster; c++) {
+      const idx = (startRow + r) * COLS + (startCol + c);
+      const t = allTiles[idx];
+      if (t) flat.push(t);
+    }
+  }
+  if (!flat.length) return;
+
+  const FADE = 550, HOLD = 1700;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const dimOpacity = isDark ? 0.12 : 0.20;
+
+  flat.forEach(t => { t.classList.add('in-logo'); t.classList.add('tweening'); });
+  await new Promise(r => requestAnimationFrame(r));
+  flat.forEach(t => { t.style.opacity = String(dimOpacity); });
+
+  const svgMarkup = logo.svg.replace(/__FG__/g, themeFG());
+  const img = document.createElementNS(SVG_NS, 'image');
+  img.setAttribute('x', imgX.toFixed(1));
+  img.setAttribute('y', imgY.toFixed(1));
+  img.setAttribute('width', imgW.toFixed(1));
+  img.setAttribute('height', imgH.toFixed(1));
+  img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  img.setAttribute('href', 'data:image/svg+xml;utf8,' + encodeURIComponent(svgMarkup));
+  img.style.opacity = '0';
+  img.style.transition = `opacity ${FADE}ms cubic-bezier(.25,.1,.25,1)`;
+  miniSvg.appendChild(img);
+  await new Promise(r => requestAnimationFrame(r));
+  img.style.opacity = '1';
+
+  await wait(FADE + HOLD);
+
+  img.style.opacity = '0';
+  flat.forEach(t => { t.style.opacity = ''; });
+  await wait(FADE + 40);
+
+  img.remove();
+  flat.forEach(t => {
+    t.classList.remove('in-logo');
+    t.classList.remove('tweening');
+  });
+}
+
 async function playLogoFlip() {
   if (logoBusy) return scheduleNextLogo();
-  if (document.documentElement.classList.contains('mobile-mode')) return scheduleNextLogo();
   logoBusy = true;
+  if (document.documentElement.classList.contains('mobile-mode')) {
+    await playLogoFlipMobile();
+    logoBusy = false;
+    return scheduleNextLogo();
+  }
 
   const logoRegions = regions.filter(r => r.varName !== '--c-currencies');
   const reg = logoRegions[regionRotation % logoRegions.length];
