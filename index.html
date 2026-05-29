@@ -168,7 +168,7 @@ body::before {
   align-items: center;
   gap: 10px;
 }
-.theme-toggle, .style-toggle, .legend-toggle {
+.theme-toggle, .style-toggle {
   position: relative;
   width: 40px;
   height: 40px;
@@ -185,8 +185,8 @@ body::before {
   box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 10px 30px -20px rgba(0,0,0,0.25);
   transition: background .2s ease, border-color .2s ease, transform .2s ease, color .2s ease;
 }
-.theme-toggle:hover, .style-toggle:hover, .legend-toggle:hover { background: var(--tab-active-bg); border-color: var(--border-3); transform: translateY(-1px); }
-.theme-toggle svg, .style-toggle svg, .legend-toggle svg { width: 18px; height: 18px; transition: opacity .25s ease, transform .35s ease; position: absolute; }
+.theme-toggle:hover, .style-toggle:hover { background: var(--tab-active-bg); border-color: var(--border-3); transform: translateY(-1px); }
+.theme-toggle svg, .style-toggle svg { width: 18px; height: 18px; transition: opacity .25s ease, transform .35s ease; position: absolute; }
 
 .theme-toggle .icon-sun  { opacity: 0; transform: rotate(-90deg) scale(.7); }
 .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
@@ -196,11 +196,6 @@ body::before {
 .style-toggle .icon-glass { opacity: 1; transform: scale(1); }
 [data-style="solid"] .style-toggle .icon-solid { opacity: 1; transform: scale(1); }
 [data-style="solid"] .style-toggle .icon-glass { opacity: 0; transform: scale(.7); }
-.legend-toggle .icon-off { opacity: 0; transform: scale(.7); }
-.legend-toggle .icon-on  { opacity: 1; transform: scale(1); }
-[data-legend="off"] .legend-toggle .icon-off { opacity: 1; transform: scale(1); }
-[data-legend="off"] .legend-toggle .icon-on  { opacity: 0; transform: scale(.7); }
-[data-legend="off"] .legend { display: none; }
 
 .hero {
   position: relative;
@@ -548,18 +543,6 @@ header p {
 
 <body>
 <div class="controls">
-  <button class="legend-toggle" id="legendToggle" type="button" aria-label="Toggle breakdown section">
-    <svg class="icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/>
-      <circle cx="12" cy="12" r="3"/>
-    </svg>
-    <svg class="icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M10.7 5.1A9.9 9.9 0 0 1 12 5c6.5 0 10 7 10 7a13.2 13.2 0 0 1-1.7 2.5"/>
-      <path d="M6.6 6.6A13.3 13.3 0 0 0 2 12s3.5 7 10 7a9.8 9.8 0 0 0 5.4-1.6"/>
-      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
-      <path d="m2 2 20 20"/>
-    </svg>
-  </button>
   <button class="style-toggle" id="styleToggle" type="button" aria-label="Toggle visual style">
     <svg class="icon-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M15 3h6v6"/>
@@ -794,22 +777,6 @@ themeBtn.addEventListener('click', () => {
     localStorage.setItem('massive-theme', 'dark');
   }
   buildMosaic();
-});
-
-const legendBtn = document.getElementById('legendToggle');
-const storedLegend = localStorage.getItem('massive-legend');
-if (storedLegend === 'off') {
-  document.documentElement.setAttribute('data-legend', 'off');
-}
-legendBtn.addEventListener('click', () => {
-  const off = document.documentElement.getAttribute('data-legend') === 'off';
-  if (off) {
-    document.documentElement.removeAttribute('data-legend');
-    localStorage.setItem('massive-legend', 'on');
-  } else {
-    document.documentElement.setAttribute('data-legend', 'off');
-    localStorage.setItem('massive-legend', 'off');
-  }
 });
 
 const styleBtn = document.getElementById('styleToggle');
