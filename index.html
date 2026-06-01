@@ -60,7 +60,7 @@
   --media-w:           75vw;
   --media-w-max:       1400px;
   --media-h:           1600px;
-  --media-opacity:     0.85;
+  --media-opacity:     0.4;
   --media-mask-l:      65%;
   --media-mask-b:      70%;
   --media-z:           0;
@@ -107,6 +107,7 @@
 
   --image-blend:  screen;
   --image-invert: 1;
+  --media-opacity: 0.85;
 
   --c-stocks:   #60a5fa;
   --c-options:  #c084fc;
@@ -180,7 +181,7 @@ body::before {
   align-items: center;
   gap: 10px;
 }
-.theme-toggle, .style-toggle, .viewport-toggle {
+.theme-toggle, .style-toggle, .viewport-toggle, .anim-toggle {
   position: relative;
   width: 40px;
   height: 40px;
@@ -197,8 +198,8 @@ body::before {
   box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 10px 30px -20px rgba(0,0,0,0.25);
   transition: background .2s ease, border-color .2s ease, transform .2s ease, color .2s ease;
 }
-.theme-toggle:hover, .style-toggle:hover, .viewport-toggle:hover { background: var(--tab-active-bg); border-color: var(--border-3); transform: translateY(-1px); }
-.theme-toggle svg, .style-toggle svg, .viewport-toggle svg { width: 18px; height: 18px; transition: opacity .25s ease, transform .35s ease; position: absolute; }
+.theme-toggle:hover, .style-toggle:hover, .viewport-toggle:hover, .anim-toggle:hover { background: var(--tab-active-bg); border-color: var(--border-3); transform: translateY(-1px); }
+.theme-toggle svg, .style-toggle svg, .viewport-toggle svg, .anim-toggle svg { width: 18px; height: 18px; transition: opacity .25s ease, transform .35s ease; position: absolute; }
 
 .theme-toggle .icon-sun  { opacity: 0; transform: rotate(-90deg) scale(.7); }
 .theme-toggle .icon-moon { opacity: 1; transform: rotate(0) scale(1); }
@@ -212,6 +213,10 @@ body::before {
 .viewport-toggle .icon-desktop { opacity: 1; transform: scale(1); }
 html.mobile-mode .viewport-toggle .icon-mobile  { opacity: 1; transform: scale(1); }
 html.mobile-mode .viewport-toggle .icon-desktop { opacity: 0; transform: scale(.7); }
+.anim-toggle .icon-anim-tumble { opacity: 0; transform: scale(.7); }
+.anim-toggle .icon-anim-card { opacity: 1; transform: scale(1); }
+[data-anim="tumble"] .anim-toggle .icon-anim-tumble { opacity: 1; transform: scale(1); }
+[data-anim="tumble"] .anim-toggle .icon-anim-card { opacity: 0; transform: scale(.7); }
 
 .hero {
   position: relative;
@@ -438,7 +443,6 @@ header p {
 }
 
 /* hot tile pulse */
-.tile.tweening { transition: opacity .55s cubic-bezier(.25,.1,.25,1); }
 .tile.in-logo { animation: none !important; }
 .tile.hot {
   animation: hotPulse var(--dur, 2.6s) ease-in-out infinite;
@@ -448,6 +452,97 @@ header p {
   0%, 100% { opacity: var(--base-op, 0.5); }
   50%      { opacity: 1; }
 }
+
+/* logo flip card */
+.flip-card {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  --flip-dur: .62s;
+  --flip-ease: cubic-bezier(.34, 1.42, .52, 1);
+  -webkit-perspective: 700px;
+          perspective: 700px;
+}
+.flip-inner {
+  position: absolute;
+  inset: 0;
+  -webkit-transform-style: preserve-3d;
+          transform-style: preserve-3d;
+}
+.flip-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+}
+.flip-front svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.flip-back {
+  transform: rotateY(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.flip-logo { width: 62%; height: 62%; object-fit: contain; display: block; }
+.flip-inner.go   { -webkit-animation: cardFlip var(--flip-dur) var(--flip-ease) both;     animation: cardFlip var(--flip-dur) var(--flip-ease) both; }
+.flip-inner.back { -webkit-animation: cardFlipBack var(--flip-dur) var(--flip-ease) both; animation: cardFlipBack var(--flip-dur) var(--flip-ease) both; }
+@-webkit-keyframes cardFlip { from{transform:rotateY(0)} to{transform:rotateY(180deg)} }
+@keyframes cardFlip { from{transform:rotateY(0)} to{transform:rotateY(180deg)} }
+@-webkit-keyframes cardFlipBack { from{transform:rotateY(180deg)} to{transform:rotateY(0)} }
+@keyframes cardFlipBack { from{transform:rotateY(180deg)} to{transform:rotateY(0)} }
+.flip-card.out, .tumble-card.out { opacity: 0; -webkit-transition: opacity .24s ease; transition: opacity .24s ease; }
+
+/* logo tumble-flip reveal (X-axis + tilt) */
+.tumble-card {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  --t-dur: .82s;
+  --t-ease: cubic-bezier(.5, .04, .32, 1);
+  --t-lift-ease: cubic-bezier(.4, 0, .2, 1);
+  -webkit-perspective: 600px;
+          perspective: 600px;
+}
+.tumble-lift {
+  position: absolute;
+  inset: 0;
+  -webkit-transform-style: preserve-3d;
+          transform-style: preserve-3d;
+}
+.tumble-inner {
+  position: absolute;
+  inset: 0;
+  -webkit-transform-style: preserve-3d;
+          transform-style: preserve-3d;
+}
+.tumble-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+}
+.tumble-front svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.tumble-back {
+  transform: rotateX(180deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tumble-logo { width: 62%; height: 62%; object-fit: contain; display: block; }
+.tumble-shade { position: absolute; inset: 0; background: #000; opacity: 0; pointer-events: none; }
+
+.tumble-card.go   .tumble-inner { -webkit-animation: tumbleFlip var(--t-dur) var(--t-ease) both;     animation: tumbleFlip var(--t-dur) var(--t-ease) both; }
+.tumble-card.back .tumble-inner { -webkit-animation: tumbleFlipBack var(--t-dur) var(--t-ease) both; animation: tumbleFlipBack var(--t-dur) var(--t-ease) both; }
+.tumble-card.go .tumble-lift, .tumble-card.back .tumble-lift { -webkit-animation: tumbleLift var(--t-dur) var(--t-lift-ease) both; animation: tumbleLift var(--t-dur) var(--t-lift-ease) both; }
+.tumble-card.go .tumble-shade, .tumble-card.back .tumble-shade { -webkit-animation: tumbleShade var(--t-dur) linear both; animation: tumbleShade var(--t-dur) linear both; }
+
+@-webkit-keyframes tumbleFlip { from{transform:rotateX(0)} to{transform:rotateX(180deg)} }
+@keyframes tumbleFlip { from{transform:rotateX(0)} to{transform:rotateX(180deg)} }
+@-webkit-keyframes tumbleFlipBack { from{transform:rotateX(180deg)} to{transform:rotateX(0)} }
+@keyframes tumbleFlipBack { from{transform:rotateX(180deg)} to{transform:rotateX(0)} }
+@-webkit-keyframes tumbleLift { 0%,100%{transform:translateZ(0)} 50%{transform:translateZ(72px)} }
+@keyframes tumbleLift { 0%,100%{transform:translateZ(0)} 50%{transform:translateZ(72px)} }
+@-webkit-keyframes tumbleShade { 0%,100%{opacity:0} 50%{opacity:.5} }
+@keyframes tumbleShade { 0%,100%{opacity:0} 50%{opacity:.5} }
 
 /* corner chip */
 .scale-chip {
@@ -568,7 +663,7 @@ html.mobile-mode .stage { display: none; }
 html.mobile-mode .foot { flex-direction: column-reverse; gap: 12px; align-items: flex-start; }
 html.mobile-mode .foot .total { font-size: 24px; }
 html.mobile-mode .controls { top: 14px; right: 14px; gap: 8px; }
-html.mobile-mode .theme-toggle, html.mobile-mode .style-toggle, html.mobile-mode .viewport-toggle { width: 36px; height: 36px; }
+html.mobile-mode .theme-toggle, html.mobile-mode .style-toggle, html.mobile-mode .viewport-toggle, html.mobile-mode .anim-toggle { width: 36px; height: 36px; }
 html.mobile-mode .style-toggle { display: none; }
 
 html.mobile-mode .legend {
@@ -693,6 +788,15 @@ html.mobile-mode .cell-sub {
     <svg class="icon-mobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <rect x="7" y="3" width="10" height="18" rx="2"/>
       <path d="M11 18h2"/>
+    </svg>
+  </button>
+  <button class="anim-toggle" id="animToggle" type="button" aria-label="Toggle reveal animation">
+    <svg class="icon-anim-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="4" y="6" width="16" height="12" rx="2"/>
+    </svg>
+    <svg class="icon-anim-tumble" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 2.5 21 7v10l-9 4.5L3 17V7Z"/>
+      <path d="M12 2.5V12M12 12 3 7M12 12l9-5"/>
     </svg>
   </button>
   <button class="style-toggle" id="styleToggle" type="button" aria-label="Toggle visual style">
@@ -839,7 +943,7 @@ const regions = [
   { x: 912, y: 348, w: 264, h: 152, varName: '--c-currencies', hotPct: 0.08 }
 ];
 
-const TILE = 4;
+const TILE = 5;
 const GAP  = 1;
 const STEP = TILE + GAP;
 
@@ -1017,6 +1121,13 @@ viewportBtn.addEventListener('click', () => {
   localStorage.setItem('massive-viewport', isMobile ? 'mobile' : 'desktop');
 });
 
+const animBtn = document.getElementById('animToggle');
+animBtn.addEventListener('click', () => {
+  animMode = animMode === 'tumble' ? 'card' : 'tumble';
+  localStorage.setItem('massive-anim', animMode);
+  document.documentElement.setAttribute('data-anim', animMode);
+});
+
 const styleBtn = document.getElementById('styleToggle');
 const storedStyle = localStorage.getItem('massive-style');
 if (storedStyle === 'solid') {
@@ -1044,80 +1155,202 @@ const LOGOS = [
   { name: 'AMZN',  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="2.167 .438 251.038 259.969"><g fill-rule="evenodd"><path d="m221.503 210.324c-105.235 50.083-170.545 8.18-212.352-17.271-2.587-1.604-6.984.375-3.169 4.757 13.928 16.888 59.573 57.593 119.153 57.593 59.621 0 95.09-32.532 99.527-38.207 4.407-5.627 1.294-8.731-3.16-6.872zm29.555-16.322c-2.826-3.68-17.184-4.366-26.22-3.256-9.05 1.078-22.634 6.609-21.453 9.93.606 1.244 1.843.686 8.06.127 6.234-.622 23.698-2.826 27.337 1.931 3.656 4.79-5.57 27.608-7.255 31.288-1.628 3.68.622 4.629 3.68 2.178 3.016-2.45 8.476-8.795 12.14-17.774 3.639-9.028 5.858-21.622 3.71-24.424z" fill="#f90" fill-rule="nonzero"/><path d="m150.744 108.13c0 13.141.332 24.1-6.31 35.77-5.361 9.489-13.853 15.324-23.341 15.324-12.952 0-20.495-9.868-20.495-24.432 0-28.75 25.76-33.968 50.146-33.968zm34.015 82.216c-2.23 1.992-5.456 2.135-7.97.806-11.196-9.298-13.189-13.615-19.356-22.487-18.502 18.882-31.596 24.527-55.601 24.527-28.37 0-50.478-17.506-50.478-52.565 0-27.373 14.85-46.018 35.96-55.126 18.313-8.066 43.884-9.489 63.43-11.718v-4.365c0-8.018.616-17.506-4.08-24.432-4.128-6.215-12.003-8.777-18.93-8.777-12.856 0-24.337 6.594-27.136 20.257-.57 3.037-2.799 6.026-5.835 6.168l-32.735-3.51c-2.751-.618-5.787-2.847-5.028-7.07 7.543-39.66 43.36-51.616 75.43-51.616 16.415 0 37.858 4.365 50.81 16.795 16.415 15.323 14.849 35.77 14.849 58.02v52.565c0 15.798 6.547 22.724 12.714 31.264 2.182 3.036 2.657 6.69-.095 8.966-6.879 5.74-19.119 16.415-25.855 22.393l-.095-.095" fill="__FG__"/></g></svg>' }
 ];
 
+// Per-region logo files. Drop SVGs in assets/<region>/ and list them here.
+const REGION_LOGOS = {
+  '--c-indices':    ['assets/indices/1.svg', 'assets/indices/2.svg', 'assets/indices/3.svg', 'assets/indices/4.svg', 'assets/indices/5.svg'],
+  '--c-currencies': ['assets/currencies/1.svg', 'assets/currencies/2.svg', 'assets/currencies/3.svg']
+};
+
 const wait = ms => new Promise(r => setTimeout(r, ms));
+const stage = document.getElementById('stage');
 let logoIdx = 0;
 let regionRotation = 0;
 let logoBusy = false;
+
+const CLUSTER = 12;
+const FLIP_DUR = 620;
+const FLIP_HOLD = 1400;
+const TUMBLE_DUR = 820;
+
+let animMode = localStorage.getItem('massive-anim') === 'tumble' ? 'tumble' : 'card';
+document.documentElement.setAttribute('data-anim', animMode);
+const revealFn = () => animMode === 'tumble' ? tumbleReveal : flipReveal;
 
 function themeFG() {
   return document.documentElement.getAttribute('data-theme') === 'dark' ? '#fafafa' : '#0a0a0a';
 }
 
+function revealDim() {
+  return document.documentElement.getAttribute('data-theme') === 'dark' ? '0.16' : '0.22';
+}
+
+function regionLogos(reg) {
+  const list = REGION_LOGOS[reg.varName];
+  return list && list.length ? list : null;
+}
+
+function pickLogoSrc(reg) {
+  const list = regionLogos(reg);
+  if (list) return list[logoIdx % list.length];
+  const logo = LOGOS[logoIdx % LOGOS.length];
+  return 'data:image/svg+xml;utf8,' + encodeURIComponent(logo.svg.replace(/__FG__/g, themeFG()));
+}
+
+function buildFrontFace(tileEls, box) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('viewBox', '0 0 100 100');
+  svg.setAttribute('preserveAspectRatio', 'none');
+  tileEls.forEach(t => {
+    const b = t.getBoundingClientRect();
+    const rect = document.createElementNS(SVG_NS, 'rect');
+    rect.setAttribute('x', ((b.left - box.left) / box.width  * 100).toFixed(2));
+    rect.setAttribute('y', ((b.top  - box.top ) / box.height * 100).toFixed(2));
+    rect.setAttribute('width',  (b.width  / box.width  * 100).toFixed(2));
+    rect.setAttribute('height', (b.height / box.height * 100).toFixed(2));
+    rect.setAttribute('rx', 0.6);
+    rect.setAttribute('fill', t.getAttribute('fill'));
+    rect.setAttribute('opacity', t.getAttribute('opacity'));
+    svg.appendChild(rect);
+  });
+  return svg;
+}
+
+async function flipReveal(container, tileEls, logoSrc) {
+  const present = tileEls.filter(Boolean);
+  if (!present.length) return;
+
+  const cr = container.getBoundingClientRect();
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  present.forEach(t => {
+    const b = t.getBoundingClientRect();
+    if (b.left   < minX) minX = b.left;
+    if (b.top    < minY) minY = b.top;
+    if (b.right  > maxX) maxX = b.right;
+    if (b.bottom > maxY) maxY = b.bottom;
+  });
+  const box = { left: minX, top: minY, width: maxX - minX, height: maxY - minY };
+
+  const card = document.createElement('div');
+  card.className = 'flip-card';
+  card.style.left   = (minX - cr.left) + 'px';
+  card.style.top    = (minY - cr.top)  + 'px';
+  card.style.width  = box.width  + 'px';
+  card.style.height = box.height + 'px';
+
+  const inner = document.createElement('div'); inner.className = 'flip-inner';
+  const front = document.createElement('div'); front.className = 'flip-face flip-front';
+  const back  = document.createElement('div'); back.className  = 'flip-face flip-back';
+
+  front.appendChild(buildFrontFace(present, box));
+
+  const img = document.createElement('img');
+  img.className = 'flip-logo';
+  img.alt = '';
+  img.src = logoSrc;
+  back.appendChild(img);
+
+  inner.appendChild(front);
+  inner.appendChild(back);
+  card.appendChild(inner);
+  container.appendChild(card);
+
+  present.forEach(t => { t.classList.add('in-logo'); t.style.opacity = revealDim(); });
+
+  await new Promise(r => requestAnimationFrame(r));
+  inner.classList.add('go');
+  await wait(FLIP_DUR + FLIP_HOLD);
+  inner.classList.remove('go');
+  inner.classList.add('back');
+  await wait(FLIP_DUR);
+
+  present.forEach(t => { t.classList.remove('in-logo'); t.style.opacity = ''; });
+  card.classList.add('out');
+  await wait(240);
+  card.remove();
+}
+
+async function tumbleReveal(container, tileEls, logoSrc) {
+  const present = tileEls.filter(Boolean);
+  if (!present.length) return;
+
+  const cr = container.getBoundingClientRect();
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  present.forEach(t => {
+    const b = t.getBoundingClientRect();
+    if (b.left   < minX) minX = b.left;
+    if (b.top    < minY) minY = b.top;
+    if (b.right  > maxX) maxX = b.right;
+    if (b.bottom > maxY) maxY = b.bottom;
+  });
+  const box = { left: minX, top: minY, width: maxX - minX, height: maxY - minY };
+
+  const card = document.createElement('div');
+  card.className = 'tumble-card';
+  card.style.left   = (minX - cr.left) + 'px';
+  card.style.top    = (minY - cr.top)  + 'px';
+  card.style.width  = box.width  + 'px';
+  card.style.height = box.height + 'px';
+
+  const lift  = document.createElement('div'); lift.className  = 'tumble-lift';
+  const inner = document.createElement('div'); inner.className = 'tumble-inner';
+  const front = document.createElement('div'); front.className = 'tumble-face tumble-front';
+  const back  = document.createElement('div'); back.className  = 'tumble-face tumble-back';
+
+  front.appendChild(buildFrontFace(present, box));
+
+  const img = document.createElement('img');
+  img.className = 'tumble-logo';
+  img.alt = '';
+  img.src = logoSrc;
+  back.appendChild(img);
+
+  const frontShade = document.createElement('div'); frontShade.className = 'tumble-shade';
+  const backShade  = document.createElement('div'); backShade.className  = 'tumble-shade';
+  front.appendChild(frontShade);
+  back.appendChild(backShade);
+
+  inner.appendChild(front);
+  inner.appendChild(back);
+  lift.appendChild(inner);
+  card.appendChild(lift);
+  container.appendChild(card);
+
+  present.forEach(t => { t.classList.add('in-logo'); t.style.opacity = revealDim(); });
+
+  await new Promise(r => requestAnimationFrame(r));
+  card.classList.add('go');
+  await wait(TUMBLE_DUR + FLIP_HOLD);
+  card.classList.remove('go');
+  card.classList.add('back');
+  await wait(TUMBLE_DUR);
+
+  present.forEach(t => { t.classList.remove('in-logo'); t.style.opacity = ''; });
+  card.classList.add('out');
+  await wait(240);
+  card.remove();
+}
+
 async function playLogoFlipMobile() {
-  const logoRegions = regions.filter(r => r.varName !== '--c-currencies');
+  const logoRegions = regions.filter(r => r.varName !== '--c-currencies' || regionLogos(r));
   const reg = logoRegions[regionRotation % logoRegions.length];
   regionRotation++;
-  const logo = LOGOS[logoIdx % LOGOS.length];
+  const logoSrc = pickLogoSrc(reg);
   logoIdx++;
 
   const regionIdx = regions.indexOf(reg);
   const miniSvg = document.querySelectorAll('.region-mini svg')[regionIdx];
   if (!miniSvg) return;
 
-  const COLS = 80, ROWS = 28;
-  const cluster = 12, innerPad = 2;
-  const startCol = 61;
-  const startRow = 8;
-
-  const imgX = (startCol + innerPad) * STEP;
-  const imgY = (startRow + innerPad) * STEP;
-  const imgW = (cluster - innerPad * 2) * STEP;
-  const imgH = (cluster - innerPad * 2) * STEP;
-
+  const COLS = 80, startCol = 61, startRow = 8;
   const allTiles = miniSvg.querySelectorAll('rect.tile');
   const flat = [];
-  for (let r = 0; r < cluster; r++) {
-    for (let c = 0; c < cluster; c++) {
-      const idx = (startRow + r) * COLS + (startCol + c);
-      const t = allTiles[idx];
+  for (let r = 0; r < CLUSTER; r++) {
+    for (let c = 0; c < CLUSTER; c++) {
+      const t = allTiles[(startRow + r) * COLS + (startCol + c)];
       if (t) flat.push(t);
     }
   }
-  if (!flat.length) return;
-
-  const FADE = 400, HOLD = 1200;
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const dimOpacity = isDark ? 0.12 : 0.20;
-
-  flat.forEach(t => { t.classList.add('in-logo'); t.classList.add('tweening'); });
-  await new Promise(r => requestAnimationFrame(r));
-  flat.forEach(t => { t.style.opacity = String(dimOpacity); });
-
-  const svgMarkup = logo.svg.replace(/__FG__/g, themeFG());
-  const img = document.createElementNS(SVG_NS, 'image');
-  img.setAttribute('x', imgX.toFixed(1));
-  img.setAttribute('y', imgY.toFixed(1));
-  img.setAttribute('width', imgW.toFixed(1));
-  img.setAttribute('height', imgH.toFixed(1));
-  img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-  img.setAttribute('href', 'data:image/svg+xml;utf8,' + encodeURIComponent(svgMarkup));
-  img.style.opacity = '0';
-  img.style.transition = `opacity ${FADE}ms cubic-bezier(.25,.1,.25,1)`;
-  miniSvg.appendChild(img);
-  await new Promise(r => requestAnimationFrame(r));
-  img.style.opacity = '1';
-
-  await wait(FADE + HOLD);
-
-  img.style.opacity = '0';
-  flat.forEach(t => { t.style.opacity = ''; });
-  await wait(FADE + 40);
-
-  img.remove();
-  flat.forEach(t => {
-    t.classList.remove('in-logo');
-    t.classList.remove('tweening');
-  });
+  await revealFn()(miniSvg.parentElement.parentElement, flat, logoSrc);
 }
 
 async function playLogoFlip() {
@@ -1132,22 +1365,16 @@ async function playLogoFlip() {
   const logoRegions = regions.filter(r => r.varName !== '--c-currencies');
   const reg = logoRegions[regionRotation % logoRegions.length];
   regionRotation++;
-  const logo = LOGOS[logoIdx % LOGOS.length];
+  const logoSrc = pickLogoSrc(reg);
   logoIdx++;
 
-  const side = 12;
-  const clusterCols = side;
-  const clusterRows = side;
   const edgePad = 2;
-  const innerPad = 2;
-  const colRange = Math.max(0, reg.cols - clusterCols - edgePad * 2);
-  const rowRange = Math.max(0, reg.rows - clusterRows - edgePad * 2);
+  const colRange = Math.max(0, reg.cols - CLUSTER - edgePad * 2);
+  const rowRange = Math.max(0, reg.rows - CLUSTER - edgePad * 2);
   const regionAttr = regions.indexOf(reg);
 
   const offX = reg.x + (reg.w - reg.cols * STEP) / 2;
   const offY = reg.y + (reg.h - reg.rows * STEP) / 2;
-  const imgW = (clusterCols - innerPad * 2) * STEP;
-  const imgH = (clusterRows - innerPad * 2) * STEP;
 
   const labelEl = document.querySelectorAll('.region-label')[regionAttr];
   let labelRect = null;
@@ -1165,71 +1392,31 @@ async function playLogoFlip() {
     }
   }
   const margin = STEP * 2;
-  let startCol = 0, startRow = 0;
+  let startCol = edgePad, startRow = edgePad;
   for (let attempt = 0; attempt < 40; attempt++) {
     startCol = edgePad + Math.floor(Math.random() * (colRange + 1));
     startRow = edgePad + Math.floor(Math.random() * (rowRange + 1));
     if (!labelRect) break;
-    const ix = offX + (startCol + innerPad) * STEP;
-    const iy = offY + (startRow + innerPad) * STEP;
+    const ix = offX + startCol * STEP;
+    const iy = offY + startRow * STEP;
+    const span = CLUSTER * STEP;
     const overlaps =
       ix < labelRect.x + labelRect.w + margin &&
-      ix + imgW + margin > labelRect.x &&
+      ix + span + margin > labelRect.x &&
       iy < labelRect.y + labelRect.h + margin &&
-      iy + imgH + margin > labelRect.y;
+      iy + span + margin > labelRect.y;
     if (!overlaps) break;
   }
 
-  const tilesGrid = [];
   const flat = [];
-  for (let r = 0; r < clusterRows; r++) {
-    const row = [];
-    for (let c = 0; c < clusterCols; c++) {
+  for (let r = 0; r < CLUSTER; r++) {
+    for (let c = 0; c < CLUSTER; c++) {
       const t = mosaic.querySelector(`.tile[data-region="${regionAttr}"][data-row="${startRow + r}"][data-col="${startCol + c}"]`);
-      row.push(t);
       if (t) flat.push(t);
     }
-    tilesGrid.push(row);
   }
-  if (!flat.length) { logoBusy = false; return scheduleNextLogo(); }
 
-  const imgX = offX + (startCol + innerPad) * STEP;
-  const imgY = offY + (startRow + innerPad) * STEP;
-
-  const FADE = 400, HOLD = 1200;
-
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const dimOpacity = isDark ? 0.12 : 0.20;
-
-  flat.forEach(t => { t.classList.add('in-logo'); t.classList.add('tweening'); });
-  await new Promise(r => requestAnimationFrame(r));
-  flat.forEach(t => { t.style.opacity = String(dimOpacity); });
-
-  const svgMarkup = logo.svg.replace(/__FG__/g, themeFG());
-  const img = document.createElementNS(SVG_NS, 'image');
-  img.setAttribute('x', imgX.toFixed(1));
-  img.setAttribute('y', imgY.toFixed(1));
-  img.setAttribute('width', imgW.toFixed(1));
-  img.setAttribute('height', imgH.toFixed(1));
-  img.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-  img.setAttribute('href', 'data:image/svg+xml;utf8,' + encodeURIComponent(svgMarkup));
-  img.style.opacity = '0';
-  img.style.transition = `opacity ${FADE}ms cubic-bezier(.25,.1,.25,1)`;
-  mosaic.appendChild(img);
-  await new Promise(r => requestAnimationFrame(r));
-  img.style.opacity = '1';
-
-  await wait(FADE + HOLD);
-
-  img.style.opacity = '0';
-  flat.forEach(t => { t.style.opacity = ''; });
-  await wait(FADE + 40);
-
-  img.remove();
-  flat.forEach(t => {
-    t.classList.remove('in-logo');
-    t.classList.remove('tweening');
-  });
+  await revealFn()(stage, flat, logoSrc);
   logoBusy = false;
   scheduleNextLogo();
 }
