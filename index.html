@@ -397,30 +397,24 @@ header { margin-bottom: 28px; }
   background: var(--glass);
   -webkit-backdrop-filter: var(--ticker-blur);
           backdrop-filter: var(--ticker-blur);
-  color: var(--fg-300);
-  cursor: pointer;
+  color: var(--fg-50);
+  cursor: default;
+  user-select: none;
   font: 600 11px/1 var(--mono);
   letter-spacing: .14em;
   text-transform: uppercase;
-  transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
 }
-.live-toggle:hover { background: var(--tab-active-bg); border-color: var(--border-3); transform: translateY(-1px); }
 .live-toggle .live-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--fg-700);
-  transition: background .2s ease, box-shadow .2s ease;
-}
-.live-toggle.on { color: var(--fg-50); border-color: var(--border-3); }
-.live-toggle.on .live-dot {
-  background: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239,68,68,0.18);
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(52,211,153,0.18);
   animation: livePulse 1.6s ease-in-out infinite;
 }
 @keyframes livePulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(239,68,68,0.18); }
-  50%      { box-shadow: 0 0 0 6px rgba(239,68,68,0.06); }
+  0%, 100% { box-shadow: 0 0 0 3px rgba(52,211,153,0.18); }
+  50%      { box-shadow: 0 0 0 6px rgba(52,211,153,0.06); }
 }
 html.mobile-mode .live-toggle { height: 36px; padding: 0 10px; }
 html.mobile-mode .live-toggle .live-label { display: none; }
@@ -605,6 +599,18 @@ header p {
   0%, 100% { opacity: var(--base-op, 0.5); }
   50%      { opacity: 1; }
 }
+/* glowing beacon tiles — cached blur drop-shadow, opacity pulse (compositor-promoted) */
+.tile.glow {
+  filter: drop-shadow(0 0 2px rgba(202,222,255,0.9));
+  will-change: opacity;
+  animation: glowPulse var(--gdur, 3.4s) ease-in-out infinite;
+  animation-delay: var(--gdelay, 0s);
+}
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+[data-palette="color"] .tile.glow { filter: drop-shadow(0 0 2px rgba(255,255,255,0.85)); }
 
 /* page-load reveal: each region wiped in via a diagonal mask sweep, cascaded */
 .mosaic-loading .region-group {
@@ -758,7 +764,17 @@ header p {
   transition: opacity .18s ease;
   pointer-events: none;
 }
-.hero-card .hc-overlay .arrow { font-size: 5.6cqw; transition: transform .18s ease; }
+.hero-card .hc-overlay .arrow {
+  width: 2.4cqw;
+  height: 2.4cqw;
+  margin-left: 0.8cqw;
+  border-top: 0.8cqw solid currentColor;
+  border-right: 0.8cqw solid currentColor;
+  border-radius: 0 0.4cqw 0 0;
+  transform: rotate(45deg);
+  flex: 0 0 auto;
+  transition: transform .18s ease;
+}
 .hero-card .hc-overlay .corner {
   position: absolute;
   width: 9cqw;
@@ -772,7 +788,7 @@ header p {
 .hero-card .hc-overlay .corner.bl { bottom: 8%; left: 4%;  border-right: 0; border-top: 0;    transform: translate(5px, -5px); }
 .hero-card .hc-overlay .corner.br { bottom: 8%; right: 4%; border-left: 0;  border-top: 0;    transform: translate(-5px, -5px); }
 .flip-card:hover .hc-overlay { opacity: 1; }
-.flip-card:hover .hc-overlay .arrow { transform: translate(1px, -1px); }
+.flip-card:hover .hc-overlay .arrow { transform: rotate(45deg) scale(1.18); }
 .flip-card:hover .hc-overlay .corner { opacity: 1; transform: translate(0, 0); }
 
 /* clickable hero cards (back face only) */
@@ -1324,10 +1340,10 @@ html.mobile-mode .cell-sub {
 
 <body>
 <div class="controls">
-  <button class="live-toggle" id="liveToggle" type="button" aria-label="Toggle live price simulation">
+  <span class="live-toggle" role="status" aria-label="Live data feed">
     <span class="live-dot" aria-hidden="true"></span>
     <span class="live-label">Live</span>
-  </button>
+  </span>
   <button class="palette-toggle" id="paletteToggle" type="button" aria-label="Toggle color palette">
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <rect x="3"  y="3"  width="8" height="8" rx="2" fill="#fb923c"/>
@@ -1570,12 +1586,17 @@ function buildMosaic(animate) {
         const sheen = 1 - 0.26 * (nx * 0.4 + ny * 0.6);
         const baseOp = Math.min(1, Math.max(0.32, (0.5 + rng() * 0.5) * sheen));
         const isHot  = rng() < reg.hotPct;
+        const isGlow = rng() < 0.008;
 
         rect.setAttribute('fill', color);
-        rect.setAttribute('opacity', isHot ? 1 : baseOp.toFixed(2));
+        rect.setAttribute('opacity', (isGlow || isHot) ? 1 : baseOp.toFixed(2));
         rect.classList.add('tile');
 
-        if (isHot) {
+        if (isGlow) {
+          rect.classList.add('glow');
+          rect.style.setProperty('--gdur',   (2.8 + rng() * 2.4).toFixed(2) + 's');
+          rect.style.setProperty('--gdelay', (-rng() * 4).toFixed(2) + 's');
+        } else if (isHot) {
           rect.classList.add('hot');
           rect.style.setProperty('--base-op', '0.78');
           rect.style.setProperty('--dur',   (1.8 + rng() * 2.6).toFixed(2) + 's');
@@ -1968,7 +1989,7 @@ function buildHeroCardEl(logo) {
       <div class="hc-price">$${logo.price.toFixed(2)}</div>
     </div>
     <span class="hc-change ${up ? 'up' : 'down'}">${up ? '+' : ''}${logo.change.toFixed(2)}%</span>
-    <div class="hc-overlay"><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>Click for API <span class="arrow">↗</span></div>`;
+    <div class="hc-overlay"><span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>Click for API <span class="arrow" aria-hidden="true"></span></div>`;
   card.addEventListener('click', e => {
     e.stopPropagation();
     openCodePanel(logo);
@@ -2449,35 +2470,18 @@ document.querySelectorAll('.code-panel-tab').forEach(tab => {
 
 /* live mode: drift sample prices on an interval to feel like a feed */
 (function setupLiveMode() {
-  const btn = document.getElementById('liveToggle');
-  if (!btn) return;
-  let on = false;
-  let timer = 0;
-
+  // always live: drift sample prices on an interval to feel like a real feed
   function drift() {
     const universes = [LOGOS, REGION_LOGOS['--c-indices'] || []];
     universes.forEach(list => list.forEach(item => {
       if (typeof item.price !== 'number') return;
-      // small percentage walk, biased toward existing trend
       const dir = item.change >= 0 ? 1 : -1;
       const driftPct = (Math.random() - 0.4) * 0.0018 * dir;
-      const newPrice = item.price * (1 + driftPct);
-      item.price = newPrice;
-      // recompute change% as cumulative drift from origin would be artificial — just jitter modestly
+      item.price = item.price * (1 + driftPct);
       item.change = item.change + (Math.random() - 0.5) * 0.06;
     }));
   }
-
-  btn.addEventListener('click', () => {
-    on = !on;
-    btn.classList.toggle('on', on);
-    if (on) {
-      timer = setInterval(drift, 2200);
-    } else {
-      clearInterval(timer);
-      timer = 0;
-    }
-  });
+  setInterval(drift, 2200);
 })();
 
 /* small corner-pop flips: clusters of logos near region corners */
