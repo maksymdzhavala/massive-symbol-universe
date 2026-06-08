@@ -17,7 +17,7 @@
 <meta name="twitter:title" content="One API. Every US symbol. — Massive">
 <meta name="twitter:description" content="1.5 million tickers across stocks, options, futures, forex, and crypto. One key, one endpoint, one schema.">
 <meta name="twitter:image" content="https://massive-symbol-universe.vercel.app/og-share.png">
-<script>(function(){var s=localStorage.getItem('massive-viewport');var n=window.matchMedia('(max-width: 820px)').matches;var m=s||(n?'mobile':'desktop');var h=document.documentElement;if(m==='mobile')h.classList.add('mobile-mode');if(s)h.classList.add('viewport-forced');var t=localStorage.getItem('massive-theme');if(t!=='light')h.setAttribute('data-theme','dark');h.setAttribute('data-palette',localStorage.getItem('massive-palette')||'mono');})();</script>
+<script>(function(){var s=localStorage.getItem('massive-viewport');var n=window.matchMedia('(max-width: 820px)').matches;var m=s||(n?'mobile':'desktop');var h=document.documentElement;if(m==='mobile')h.classList.add('mobile-mode');if(s)h.classList.add('viewport-forced');var t=localStorage.getItem('massive-theme-v2');if(t!=='light')h.setAttribute('data-theme','dark');h.setAttribute('data-palette',localStorage.getItem('massive-palette')||'mono');})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..900&family=Geist+Mono:wght@400..700&family=Roboto:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1811,10 +1811,10 @@ themeBtn.addEventListener('click', () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   if (isDark) {
     document.documentElement.removeAttribute('data-theme');
-    localStorage.setItem('massive-theme', 'light');
+    localStorage.setItem('massive-theme-v2', 'light');
   } else {
     document.documentElement.setAttribute('data-theme', 'dark');
-    localStorage.setItem('massive-theme', 'dark');
+    localStorage.setItem('massive-theme-v2', 'dark');
   }
   buildMosaic(false);
   buildLegendMosaics();
