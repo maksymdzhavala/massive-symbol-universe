@@ -253,18 +253,14 @@ body::before {
 .style-toggle .icon-glass { opacity: 1; transform: scale(1); }
 [data-style="solid"] .style-toggle .icon-solid { opacity: 1; transform: scale(1); }
 [data-style="solid"] .style-toggle .icon-glass { opacity: 0; transform: scale(.7); }
-.viewport-toggle .icon-mobile  { opacity: 1; transform: scale(1); }
-.viewport-toggle .icon-desktop { opacity: 0; transform: scale(.7); }
-html.mobile-mode .viewport-toggle .icon-mobile  { opacity: 0; transform: scale(.7); }
-html.mobile-mode .viewport-toggle .icon-desktop { opacity: 1; transform: scale(1); }
 .hero {
   position: relative;
-  margin-bottom: 116px;
+  margin-bottom: 56px;
 }
 .hero-text {
   position: relative;
   z-index: 2;
-  max-width: 760px;
+  max-width: 860px;
 }
 .hero-media {
   position: absolute;
@@ -473,12 +469,14 @@ html.mobile-mode .latency-strip { font-size: 10px; padding: 6px 10px; gap: 8px; 
   box-shadow: 0 0 0 3px var(--hover-tint);
 }
 h1 {
-  font: 600 64px/1.02 var(--sans);
+  font: 600 clamp(32px, 3.7vw, 54px)/1.04 var(--sans);
   letter-spacing: -.045em;
   margin: 0 0 20px;
   color: var(--fg-50);
+  white-space: nowrap;
 }
 h1 .accent {
+  white-space: nowrap;
   background: linear-gradient(to right, var(--fg-50) 20%, var(--fg-500) 90%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
@@ -1025,7 +1023,7 @@ header p {
   -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
 }
 .cp-gate-inner { display: flex; flex-direction: column; align-items: center; gap: 9px; max-width: 320px; }
-.cp-gate-lock { width: 24px; height: 24px; color: rgba(255,255,255,0.82); margin-bottom: 2px; }
+.cp-gate-lock { width: auto; height: 26px; color: #fafafa; margin-bottom: 4px; }
 .cp-gate-title { font: 700 16px/1.2 var(--sans); color: #fafafa; letter-spacing: -.01em; }
 .cp-gate-sub { font: 500 11.5px/1.5 var(--sans); color: rgba(255,255,255,0.66); }
 .cp-gate-btn {
@@ -1405,16 +1403,6 @@ html.mobile-mode .cell-sub {
       <rect x="13" y="13" width="8" height="8" rx="2" fill="#a3e635"/>
     </svg>
   </button>
-  <button class="viewport-toggle" id="viewportToggle" type="button" aria-label="Toggle desktop/mobile preview">
-    <svg class="icon-desktop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="12" rx="2"/>
-      <path d="M8 21h8M12 16v5"/>
-    </svg>
-    <svg class="icon-mobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <rect x="7" y="3" width="10" height="18" rx="2"/>
-      <path d="M11 18h2"/>
-    </svg>
-  </button>
   <button class="style-toggle" id="styleToggle" type="button" aria-label="Toggle visual style">
     <svg class="icon-glass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M15 3h6v6"/>
@@ -1444,7 +1432,7 @@ html.mobile-mode .cell-sub {
     <header>
       <span class="eyebrow">Coverage</span>
       <h1>One API. <span class="accent">Every US stock symbol.</span></h1>
-      <p>1.5 million tickers across stocks, options, futures, forex, and crypto. One key, one endpoint, one schema &mdash; every square is a symbol we cover.</p>
+      <p>1.5 million tickers across stocks, options, futures, forex, and crypto. One key, one endpoint, one schema.</p>
     </header>
 
     <form class="ticker-search" id="tickerSearch" autocomplete="off">
@@ -1461,7 +1449,7 @@ html.mobile-mode .cell-sub {
 </div>
 
 <div class="stage" id="stage">
-  <span class="scale-chip"><strong>Each square</strong>&nbsp;=&nbsp;<em>1000s of symbols</em></span>
+  <span class="scale-chip"><strong>Each square</strong>&nbsp;=&nbsp;<em>cluster of symbols</em></span>
 
   <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid meet" id="mosaic"></svg>
 
@@ -1593,7 +1581,7 @@ html.mobile-mode .cell-sub {
         <div class="code-panel-resp"><pre class="resp-json" id="codePanelJson" aria-hidden="true"></pre></div>
         <div class="cp-gate">
           <div class="cp-gate-inner">
-            <svg class="cp-gate-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <svg class="cp-gate-lock" viewBox="0 0 36 21" fill="currentColor" aria-hidden="true"><path d="M0 0V20.831H7.67459V7.67459L13.7046 20.831H21.3792L27.4093 7.67459V20.831H35.0839V0H23.572L17.5419 13.1564L11.5119 0H0Z"/></svg>
             <div class="cp-gate-title">Get your free API key</div>
             <div class="cp-gate-sub">Unlock live quotes, trades, fundamentals &amp; 1.5M tickers — free, no credit card.</div>
             <a class="cp-gate-btn" href="https://massive.com/signup" target="_blank" rel="noopener">Get your free API key &rarr;</a>
@@ -1994,16 +1982,10 @@ paletteBtn.addEventListener('click', () => {
   buildLegendMosaics();
 });
 
-const viewportBtn = document.getElementById('viewportToggle');
 const vpMq = window.matchMedia('(max-width: 820px)');
 vpMq.addEventListener('change', e => {
   if (localStorage.getItem('massive-viewport')) return;
   document.documentElement.classList.toggle('mobile-mode', e.matches);
-});
-viewportBtn.addEventListener('click', () => {
-  const isMobile = document.documentElement.classList.toggle('mobile-mode');
-  document.documentElement.classList.add('viewport-forced');
-  localStorage.setItem('massive-viewport', isMobile ? 'mobile' : 'desktop');
 });
 
 const styleBtn = document.getElementById('styleToggle');
@@ -2024,6 +2006,7 @@ styleBtn.addEventListener('click', () => {
 
 /* logo flip easter egg */
 const LOGOS = [
+  { name: 'SPCX',  price: 177.13, change: 10.05, svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path fill="__FG__" d="M31.937 9.287c-0.011 0-0.016-0.005-0.020-0.005-0.011 0-0.021 0.005-0.032 0.011-20.172 2.031-29.651 10.801-31.885 12.959l0.297 0.468h3.525c9.161-9.213 21.541-12.271 28.089-13.276l0.005 0.005c0.004 0 0.009-0.011 0.015-0.011 0.037-0.005 0.068-0.036 0.068-0.077 0-0.037-0.027-0.063-0.063-0.073zM0.505 14.011l-0.213 0.401 4.328 3.156c0.875-0.511 1.771-0.984 2.683-1.432l-2.901-2.125zM10.125 18.197c-0.719 0.532-1.448 1.095-2.235 1.756l3.803 2.765h3.943l0.167-0.359z"/></svg>' },
   { name: 'AAPL',  price: 228.40, change: 1.84,  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="__FG__" d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>' },
   { name: 'TSLA',  price: 412.10, change: -1.20, svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 254.584 253.502"><g transform="translate(-45.84,-64.297)" fill="#e82127"><path d="M 173.146,317.299 208.622,117.78 c 33.815,0 44.481,3.708 46.021,18.843 0,0 22.684,-8.458 34.125,-25.636 C 244.122,90.299 199.263,89.366 199.263,89.366 l -26.176,31.882 0.059,-0.004 -26.176,-31.883 c 0,0 -44.86,0.934 -89.5,21.622 11.431,17.178 34.124,25.636 34.124,25.636 1.549,-15.136 12.202,-18.844 45.79,-18.868 l 35.762,199.548"/><path d="m 173.132,80.157 c 36.09,-0.276 77.399,5.583 119.687,24.014 5.652,-10.173 7.105,-14.669 7.105,-14.669 C 253.697,71.213 210.406,64.954 173.127,64.797 135.85,64.954 92.561,71.214 46.34,89.502 c 0,0 2.062,5.538 7.1,14.669 42.28,-18.431 83.596,-24.29 119.687,-24.014 h 0.005"/></g></svg>' },
   { name: 'MSFT',  price: 484.20, change: 0.62,  svg: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#F25022" d="M0 0h11.4v11.4H0z"/><path fill="#7FBA00" d="M12.6 0H24v11.4H12.6z"/><path fill="#00A4EF" d="M0 12.6h11.4V24H0z"/><path fill="#FFB900" d="M12.6 12.6H24V24H12.6z"/></svg>' },
@@ -2524,6 +2507,7 @@ const codePanelSummaryMeta = document.getElementById('codePanelSummaryMeta');
 
 // reference metadata for the (free) ticker-details block — swap for real values from the API
 const TICKER_META = {
+  SPCX: { name: 'Space Exploration Technologies Corp.', exch: 'XNAS', type: 'CS',    market: 'stocks' },
   AAPL: { name: 'Apple Inc.',                   exch: 'XNAS', type: 'CS',    market: 'stocks' },
   TSLA: { name: 'Tesla, Inc.',                  exch: 'XNAS', type: 'CS',    market: 'stocks' },
   MSFT: { name: 'Microsoft Corporation',        exch: 'XNAS', type: 'CS',    market: 'stocks' },
